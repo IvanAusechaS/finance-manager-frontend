@@ -105,16 +105,3 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Optional: Run SonarQube scan if self-hosted server is configured
-      - name: SonarQube Optional Scan
-        if: ${{ secrets.SONARQUBE_TOKEN != '' && secrets.SONARQUBE_HOST != '' }}
-        run: |
-          echo "Running SonarQube scanner (optional self-hosted instance)"
-          # Install sonar-scanner CLI if needed
-          # npm install -g sonarqube-scanner
-          # sonar-scanner \
-          #   -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-          #   -Dsonar.host.url=${{ secrets.SONARQUBE_HOST }} \
-          #   -Dsonar.login=${{ secrets.SONARQUBE_TOKEN }} \
-          #   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-        continue-on-error: true
