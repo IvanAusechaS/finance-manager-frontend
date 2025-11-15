@@ -83,7 +83,6 @@ jobs:
 
       # Deploy to Vercel using CLI
       - name: Deploy to Vercel
-        if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
         run: |
           npm install -g vercel@latest
           echo "Deploying to Vercel..."
@@ -94,6 +93,7 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        continue-on-error: true
 
       # Alternative: Deploy using Vercel GitHub integration (simpler approach)
       # If you have Vercel connected to your GitHub repo, deployment happens automatically
