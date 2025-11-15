@@ -1,10 +1,36 @@
-# CODEOWNERS for Frontend Repository
-# This file defines who is responsible for reviewing and approving pull requests.
+# CODEOWNERS file
+# This file defines the individuals or teams responsible for code review in this repository.
+# More information: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
-# General rule: all files require review by frontend owners
-*             @IvanAusechaS @AndreyQuicenoC
+# Default owners for everything in the repo
+* @IvanAusechaS
 
-# Specific paths
-src/**        @IvanAusechaS @AndreyQuicenoC
-tests/**      @JonMeister
-.github/**    @IvanAusechaS
+# Frontend components and pages
+/src/components/ @IvanAusechaS
+/src/pages/ @IvanAusechaS
+
+# Authentication-related files (require security review)
+/src/pages/Login.tsx @IvanAusechaS
+/src/pages/Signup.tsx @IvanAusechaS
+/src/pages/ForgotPassword.tsx @IvanAusechaS
+/src/pages/ResetPassword.tsx @IvanAusechaS
+/src/pages/Dashboard.tsx @IvanAusechaS
+
+# Validation and security-critical code
+/src/lib/validations.ts @IvanAusechaS
+/src/lib/validations.test.ts @IvanAusechaS
+
+# CI/CD workflows and configuration
+/.github/workflows/ @IvanAusechaS
+/.github/BRANCH_PROTECTION.md @IvanAusechaS
+/.github/pull_request_template.md @IvanAusechaS
+
+# Build and configuration files
+/package.json @IvanAusechaS
+/tsconfig.json @IvanAusechaS
+/vite.config.ts @IvanAusechaS
+/vitest.config.ts @IvanAusechaS
+
+# Documentation
+/README.md @IvanAusechaS
+/LICENSE @IvanAusechaS

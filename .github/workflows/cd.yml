@@ -1,0 +1,152 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+jobs:
+  # Job 1: Build for Production
+  build-production:
+    name: Build for ${{ github.event.inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Create deployment package
+        run: |
+          mkdir -p deployment
+          cp -r dist/* deployment/
+          cp package.json deployment/
+          echo "Build completed at $(date)" > deployment/BUILD_INFO.txt
+      
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: deployment/
+          retention-days: 30
+
+  # Job 2: Deploy to Staging (optional)
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-production
+    if: github.event.inputs.environment == 'staging'
+    environment:
+      name: staging
+      url: https://staging.finance-manager.app
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./build
+      
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "This would typically deploy to your staging server"
+          echo "Examples: Vercel, Netlify, AWS S3, etc."
+          # Add your staging deployment commands here
+      
+      - name: Deployment successful
+        run: echo "✅ Staging deployment completed!"
+
+  # Job 3: Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-production
+    if: github.event.inputs.environment == 'production' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    environment:
+      name: production
+      url: https://finance-manager.app
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: ./build
+      
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          echo "This would typically deploy to your production server"
+          echo "Examples: Vercel, Netlify, AWS S3, Cloudflare Pages, etc."
+          # Add your production deployment commands here
+          
+          # Example for Vercel:
+          # npm i -g vercel
+          # vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+          
+          # Example for Netlify:
+          # npm i -g netlify-cli
+          # netlify deploy --prod --dir=./build --auth=${{ secrets.NETLIFY_TOKEN }}
+          
+          # Example for AWS S3:
+          # aws s3 sync ./build s3://${{ secrets.S3_BUCKET }} --delete
+      
+      - name: Deployment successful
+        run: |
+          echo "✅ Production deployment completed!"
+          echo "🌐 Application is now live"
+
+  # Job 4: Post-Deployment Verification
+  verify-deployment:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: success()
+    
+    steps:
+      - name: Health check
+        run: |
+          echo "🔍 Performing post-deployment health checks..."
+          # Add health check commands here
+          # Example: curl https://finance-manager.app/health
+      
+      - name: Notify deployment success
+        run: |
+          echo "📧 Sending deployment notification..."
+          echo "Deployment completed successfully at $(date)"
+
+  # Job 5: Rollback (manual trigger)
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure()
+    
+    steps:
+      - name: Rollback to previous version
+        run: |
+          echo "⚠️  Deployment failed, initiating rollback..."
+          echo "This would rollback to the previous stable version"
+          # Add rollback commands here

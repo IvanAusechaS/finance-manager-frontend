@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.vite/
+coverage/
+
+# Configuration
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Git
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.log
+.DS_Store
