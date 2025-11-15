@@ -59,13 +59,13 @@ jobs:
         if: hashFiles('package.json') != ''
         run: npm run build
 
-      # SonarQube code quality analysis
-      - name: SonarQube Scan
+      # SonarCloud code quality analysis
+      - name: SonarCloud Scan
         if: hashFiles('package.json') != ''
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     name: Deploy to Vercel
