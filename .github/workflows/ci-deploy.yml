@@ -34,18 +34,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       # Install dependencies
       - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
         run: npm ci
 
       # Run linting checks
       - name: Lint
+        if: hashFiles('package.json') != ''
         run: npm run lint
 
       # Run tests (placeholder for now, to be implemented by test owner)
       - name: Run tests (placeholder)
+        if: hashFiles('package.json') != ''
         run: |
           echo "Placeholder for tests - to be implemented by test owner"
           # Future implementation:
@@ -54,10 +56,12 @@ jobs:
 
       # Build React TypeScript project
       - name: Build
+        if: hashFiles('package.json') != ''
         run: npm run build
 
       # SonarQube code quality analysis
       - name: SonarQube Scan
+        if: hashFiles('package.json') != ''
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

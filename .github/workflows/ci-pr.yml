@@ -34,22 +34,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       # Install dependencies
       - name: Install dependencies
+        if: hashFiles('package-lock.json') != ''
         run: npm ci
 
       # Run ESLint for code quality
       - name: Run linter
+        if: hashFiles('package.json') != ''
         run: npm run lint
 
       # Build React TypeScript project
       - name: Build project
+        if: hashFiles('package.json') != ''
         run: npm run build
 
       # Run unit tests (placeholder for now)
       - name: Run unit tests (placeholder)
+        if: hashFiles('package.json') != ''
         run: |
           echo "SKIP - tests to be added by test owner"
           # Future implementation:
@@ -60,7 +63,7 @@ jobs:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     needs: [lint-and-build]
-    # Only run SonarCloud analysis on Pull Requests targeting main
+    # Only run SonarCloud analysis on Pull Requests targeting main and if package.json exists
     if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
     steps:
       # Checkout source code with full git history (required for SonarCloud)
@@ -69,19 +72,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Check if package.json exists
+      - name: Check if Node.js project exists
+        id: check_project
+        run: |
+          if [ -f "package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "No package.json found - skipping SonarCloud analysis"
+          fi
+
       # Set up Node.js environment
       - name: Setup Node.js
+        if: steps.check_project.outputs.exists == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       # Install dependencies
       - name: Install dependencies
+        if: steps.check_project.outputs.exists == 'true'
         run: npm ci
 
       # Run tests to generate coverage report (placeholder for now)
       - name: Run tests to generate coverage
+        if: steps.check_project.outputs.exists == 'true'
         run: |
           echo "Placeholder for test coverage - to be implemented by test owner"
           # Future implementation:
@@ -90,6 +106,7 @@ jobs:
 
       # Run SonarCloud scan
       - name: SonarCloud Scan
+        if: steps.check_project.outputs.exists == 'true'
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >-
