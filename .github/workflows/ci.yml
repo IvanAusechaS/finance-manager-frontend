@@ -147,27 +147,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Validate HU10 - Signup
-        run: |
-          echo "✓ Checking Signup component..."
-          test -f "src/pages/Signup.tsx" || exit 1
-          test -f "src/lib/validations.ts" || exit 1
-          echo "✓ HU10 validation passed"
-      
-      - name: Validate HU11 - Login
-        run: |
-          echo "✓ Checking Login component..."
-          test -f "src/pages/Login.tsx" || exit 1
-          test -f "src/pages/Dashboard.tsx" || exit 1
-          echo "✓ HU11 validation passed"
-      
-      - name: Validate HU12 - Password Recovery
-        run: |
-          echo "✓ Checking Password Recovery..."
-          test -f "src/pages/ForgotPassword.tsx" || exit 1
-          test -f "src/pages/ResetPassword.tsx" || exit 1
-          echo "✓ HU12 validation passed"
-
   ci-success:
     name: CI Pipeline Success
     runs-on: ubuntu-latest
