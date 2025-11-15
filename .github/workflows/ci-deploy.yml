@@ -56,6 +56,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      # SonarQube code quality analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
