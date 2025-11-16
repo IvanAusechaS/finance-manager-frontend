@@ -51,13 +51,9 @@ jobs:
         run: npm run build
 
       # Run unit tests (placeholder for now)
-      - name: Run unit tests (placeholder)
+      - name: Run unit tests with coverage
         if: hashFiles('package.json') != ''
-        run: |
-          echo "SKIP - tests to be added by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false
-          # or: npm test -- --coverage --ci --passWithNoTests
+        run: npm run test:coverage
 
   sonarcloud-analysis:
     name: SonarCloud Analysis
@@ -95,14 +91,10 @@ jobs:
         if: steps.check_project.outputs.exists == 'true'
         run: npm ci
 
-      # Run tests to generate coverage report (placeholder for now)
+      # Run tests to generate coverage report
       - name: Run tests to generate coverage
         if: steps.check_project.outputs.exists == 'true'
-        run: |
-          echo "Placeholder for test coverage - to be implemented by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false --coverageReporters=lcov
-          # This should generate coverage/lcov.info file
+        run: npm run test:coverage
 
       # Run SonarCloud scan
       - name: SonarCloud Scan

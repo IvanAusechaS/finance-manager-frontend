@@ -46,13 +46,9 @@ jobs:
         run: npm run lint
 
       # Run tests (placeholder for now, to be implemented by test owner)
-      - name: Run tests (placeholder)
+      - name: Run tests with coverage
         if: hashFiles('package.json') != ''
-        run: |
-          echo "Placeholder for tests - to be implemented by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false --ci --passWithNoTests
-          # or: npm test -- --coverage --ci
+        run: npm run test:coverage
 
       # Build React TypeScript project
       - name: Build
