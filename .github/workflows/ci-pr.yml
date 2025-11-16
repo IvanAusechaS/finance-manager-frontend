@@ -51,13 +51,9 @@ jobs:
         run: npm run build
 
       # Run unit tests (placeholder for now)
-      - name: Run unit tests (placeholder)
+      - name: Run unit tests with coverage
         if: hashFiles('package.json') != ''
-        run: |
-          echo "SKIP - tests to be added by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false
-          # or: npm test -- --coverage --ci --passWithNoTests
+        run: npm run test:coverage
 
   sonarcloud-analysis:
     name: SonarCloud Analysis
@@ -95,29 +91,15 @@ jobs:
         if: steps.check_project.outputs.exists == 'true'
         run: npm ci
 
-      # Run tests to generate coverage report (placeholder for now)
+      # Run tests to generate coverage report
       - name: Run tests to generate coverage
         if: steps.check_project.outputs.exists == 'true'
-        run: |
-          echo "Placeholder for test coverage - to be implemented by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false --coverageReporters=lcov
-          # This should generate coverage/lcov.info file
+        run: npm run test:coverage
 
       # Run SonarCloud scan
       - name: SonarCloud Scan
         if: steps.check_project.outputs.exists == 'true'
         uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >-
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.sources=src
-            -Dsonar.tests=src
-            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx
-            -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

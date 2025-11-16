@@ -46,26 +46,22 @@ jobs:
         run: npm run lint
 
       # Run tests (placeholder for now, to be implemented by test owner)
-      - name: Run tests (placeholder)
+      - name: Run tests with coverage
         if: hashFiles('package.json') != ''
-        run: |
-          echo "Placeholder for tests - to be implemented by test owner"
-          # Future implementation:
-          # npm run test -- --coverage --watchAll=false --ci --passWithNoTests
-          # or: npm test -- --coverage --ci
+        run: npm run test:coverage
 
       # Build React TypeScript project
       - name: Build
         if: hashFiles('package.json') != ''
         run: npm run build
 
-      # SonarQube code quality analysis
-      - name: SonarQube Scan
+      # SonarCloud code quality analysis
+      - name: SonarCloud Scan
         if: hashFiles('package.json') != ''
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     name: Deploy to Vercel
