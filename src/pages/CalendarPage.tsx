@@ -52,6 +52,24 @@ interface MonthlyStats {
   savingsChange: number;
 }
 
+/**
+ * CalendarPage Component
+ * 
+ * Interactive calendar view for visualizing financial transactions over time.
+ * Provides a monthly overview with daily transaction summaries and statistics.
+ * 
+ * Features:
+ * - Monthly calendar display with date navigation
+ * - Visual transaction indicators on calendar dates
+ * - Daily income and expense summaries
+ * - Click to view detailed transactions for specific dates
+ * - Month-to-month comparison statistics
+ * - Account filtering for focused analysis
+ * - Responsive design for mobile and desktop
+ * - Color-coded income (green) and expense (red) indicators
+ * 
+ * @returns {JSX.Element} The calendar page with transaction visualization
+ */
 export function CalendarPage() {
   console.log("📅 [CalendarPage] Componente montado");
   const navigate = useNavigate();
