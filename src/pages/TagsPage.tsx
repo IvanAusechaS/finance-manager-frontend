@@ -77,6 +77,7 @@ export function TagsPage() {
     name: "",
     description: "",
     accountId: "",
+    color: "#3b82f6",
   });
 
   const [errors, setErrors] = useState({
@@ -133,6 +134,7 @@ export function TagsPage() {
       name: "",
       description: "",
       accountId: accounts[0]?.id.toString() || "",
+      color: "#3b82f6",
     });
     setErrors({ name: "", accountId: "" });
     setIsDialogOpen(true);
@@ -144,6 +146,7 @@ export function TagsPage() {
       name: tag.name,
       description: tag.description || "",
       accountId: tag.accountId.toString(),
+      color: tag.color || "#3b82f6",
     });
     setErrors({ name: "", accountId: "" });
     setIsDialogOpen(true);
@@ -197,6 +200,7 @@ export function TagsPage() {
         // Crear nueva tag
         await tagApi.create({
           name: formData.name,
+          color: formData.color || "#3b82f6", // Default color
           description: formData.description || undefined,
           accountId: Number(formData.accountId),
         });
@@ -544,7 +548,7 @@ export function TagsPage() {
           <Button
             onClick={() => {
               console.log("➕ [TagsPage] Abriendo diálogo de creación");
-              setFormData({ name: "", description: "", accountId: "" });
+              setFormData({ name: "", description: "", accountId: "", color: "#3b82f6" });
               setErrors({ name: "", accountId: "" });
               setEditingTag(null);
               setIsDialogOpen(true);

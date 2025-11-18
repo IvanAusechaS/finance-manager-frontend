@@ -136,7 +136,6 @@ export default function ProfilePage() {
       await authApi.changePassword({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
-        confirmPassword: passwordForm.confirmPassword,
       });
 
       toast.success("Contraseña actualizada exitosamente");

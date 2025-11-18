@@ -33,6 +33,7 @@ import {
   accountApi,
   transactionApi,
   authApi,
+  type Transaction,
 } from "../lib/api";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
@@ -168,8 +169,8 @@ export function DashboardPage() {
       ];
 
       currentMonthTransactions
-        .filter((t) => !t.isIncome)
-        .forEach((t) => {
+        .filter((t: Transaction) => !t.isIncome)
+        .forEach((t: Transaction) => {
           const categoryName = t.tag?.name || "Sin categoría";
           categoryMap.set(
             categoryName,
@@ -183,7 +184,7 @@ export function DashboardPage() {
           value,
           color: colors[index % colors.length],
         }))
-        .sort((a, b) => b.value - a.value)
+        .sort((a: { name: string; value: number; color: string }, b: { name: string; value: number; color: string }) => b.value - a.value)
         .slice(0, 7);
 
       setCategoryData(categoryDataArray);
@@ -196,7 +197,7 @@ export function DashboardPage() {
             new Date(a.transactionDate).getTime()
         )
         .slice(0, 5)
-        .map((t) => ({
+        .map((t: Transaction) => ({
           id: t.id,
           description: t.description || "Sin descripción",
           category: t.tag?.name || "Sin categoría",

@@ -82,6 +82,7 @@ export function CategoriesPage() {
 
     try {
       const response = await categoryApi.create({
+        name: formData.tipo, // Using tipo as name
         tipo: formData.tipo,
       });
 

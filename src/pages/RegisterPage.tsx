@@ -187,7 +187,7 @@ export function RegisterPage() {
         confirmPassword: formData.confirmPassword,
       });
 
-      toast.success(`¡Bienvenido, ${response.user.nickname}!`, {
+      toast.success(`¡Bienvenido, ${response.user?.nickname || 'Usuario'}!`, {
         description: "Tu cuenta ha sido creada exitosamente",
         icon: <CheckCircle2 />,
       });

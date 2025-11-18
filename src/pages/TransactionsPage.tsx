@@ -312,7 +312,7 @@ export function TransactionsPage() {
       isIncome: transaction.isIncome,
       transactionDate: new Date(transaction.transactionDate),
       description: transaction.description || "",
-      tagId: transaction.tagId.toString(),
+      tagId: transaction.tagId?.toString() || "",
     });
     setErrors({ amount: "", transactionDate: "", description: "", tagId: "" });
     setIsDialogOpen(true);
@@ -383,6 +383,7 @@ export function TransactionsPage() {
         transactionDate: formData.transactionDate.toISOString(),
         description: formData.description || undefined,
         tagId: Number(formData.tagId),
+        accountId: 1, // TODO: Get from user's selected account
       };
 
       if (editingTransaction) {
