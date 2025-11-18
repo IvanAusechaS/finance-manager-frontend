@@ -385,9 +385,11 @@ export function TransactionsPage() {
     e.preventDefault();
 
     if (!validateForm()) {
+      console.warn("⚠️ [TransactionsPage] Validación de formulario falló");
       return;
     }
 
+    console.log("💾 [TransactionsPage] Guardando transacción:", formData);
     setSubmitting(true);
 
     try {
@@ -400,17 +402,20 @@ export function TransactionsPage() {
       };
 
       if (editingTransaction) {
+        console.log("✏️ [TransactionsPage] Actualizando transacción:", editingTransaction.id);
         await transactionApi.update(editingTransaction.id, dataToSubmit);
         toast.success("Transacción actualizada correctamente");
       } else {
+        console.log("➕ [TransactionsPage] Creando nueva transacción");
         await transactionApi.create(dataToSubmit);
         toast.success("Transacción creada correctamente");
       }
 
+      console.log("✅ [TransactionsPage] Transacción guardada exitosamente");
       setIsDialogOpen(false);
       loadData();
     } catch (error: unknown) {
-      console.error("Error saving transaction:", error);
+      console.error("❌ [TransactionsPage] Error al guardar transacción:", error);
       toast.error(
         (error as Error).message || "Error al guardar la transacción"
       );
