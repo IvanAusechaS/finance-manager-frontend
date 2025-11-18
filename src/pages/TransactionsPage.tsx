@@ -59,6 +59,25 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Badge } from "../components/ui/badge";
 
+/**
+ * TransactionsPage Component
+ * 
+ * Comprehensive transaction management interface for tracking income and expenses.
+ * Provides full CRUD operations with advanced filtering capabilities.
+ * 
+ * Features:
+ * - Create, read, update, and delete transactions
+ * - Filter by account, tag, transaction type (income/expense)
+ * - Date range filtering with calendar picker
+ * - Search transactions by description
+ * - Visual distinction between income (green) and expense (red)
+ * - Responsive card-based layout
+ * - Real-time balance calculations
+ * - Form validation and error handling
+ * - Toast notifications for user feedback
+ * 
+ * @returns {JSX.Element} The transactions management page
+ */
 export function TransactionsPage() {
   console.log("💰 [TransactionsPage] Componente montado");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
