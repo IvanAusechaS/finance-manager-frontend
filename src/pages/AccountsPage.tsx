@@ -40,6 +40,25 @@ import { accountApi, categoryApi, authApi } from "../lib/api";
 import type { Account, Category, ApiError } from "../lib/api";
 import { Navbar } from "../components/Navbar";
 
+/**
+ * AccountsPage Component
+ * 
+ * Manages user financial accounts with full CRUD operations.
+ * Allows users to:
+ * - Create new accounts with name, initial balance, and category
+ * - View all accounts with their current balance and category
+ * - Edit existing account details
+ * - Delete accounts (with confirmation)
+ * 
+ * Features:
+ * - Category-based account organization
+ * - Real-time balance display
+ * - Responsive card-based layout
+ * - Form validation and error handling
+ * - Toast notifications for user feedback
+ * 
+ * @returns {JSX.Element} The accounts management page
+ */
 export function AccountsPage() {
   console.log("🏦 [AccountsPage] Componente montado");
   const [accounts, setAccounts] = useState<Account[]>([]);
