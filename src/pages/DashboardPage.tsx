@@ -37,27 +37,41 @@ import {
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 
+interface MonthlyChartData {
+  name: string;
+  ingresos: number;
+  gastos: number;
+}
+
+interface CategoryChartData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface RecentTransaction {
+  id: number;
+  description: string;
+  category: string;
+  amount: number;
+  date: string;
+  type: "income" | "expense";
+}
+
 export function DashboardPage() {
   console.log("📊 [DashboardPage] Componente montado");
   const { goToHome } = useRedirect();
 
   const [loading, setLoading] = useState(true);
-  // Unused state variables - reserved for future features
-  // const [userId, setUserId] = useState<number | null>(null);
-  // const [accounts, setAccounts] = useState<Account[]>([]);
-  // const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState({
     totalBalance: 0,
     monthIncome: 0,
     monthExpenses: 0,
     savings: 0,
   });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [categoryData, setCategoryData] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyChartData[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryChartData[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -175,7 +189,7 @@ export function DashboardPage() {
       setCategoryData(categoryDataArray);
 
       // Get recent transactions (last 5)
-      const recentTxs = transactionsData
+      const recentTxs: RecentTransaction[] = transactionsData
         .sort(
           (a, b) =>
             new Date(b.transactionDate).getTime() -
@@ -188,7 +202,7 @@ export function DashboardPage() {
           category: t.tag?.name || "Sin categoría",
           amount: t.isIncome ? t.amount : -t.amount,
           date: format(new Date(t.transactionDate), "yyyy-MM-dd"),
-          type: t.isIncome ? "income" : "expense",
+          type: (t.isIncome ? "income" : "expense") as "income" | "expense",
         }));
 
       setRecentTransactions(recentTxs);
