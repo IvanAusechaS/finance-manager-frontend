@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { BarChart3, PieChart, TrendingUp, Calendar } from "lucide-react";
+import { BarChart3, PieChart, TrendingUp, Calendar, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import {
   transactionApi,
   accountApi,
@@ -73,6 +73,11 @@ export function StatisticsPage() {
   const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<MonthlyTrend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [comparisonData, setComparisonData] = useState<{
+    incomeChange: number;
+    expenseChange: number;
+    transactionChange: number;
+  }>({ incomeChange: 0, expenseChange: 0, transactionChange: 0 });
 
   const CHART_COLORS = [
     "#3b82f6", // blue
@@ -121,6 +126,7 @@ export function StatisticsPage() {
       // Calculate statistics
       calculateCategoryStats(transactionsData);
       calculateMonthlyTrends(transactionsData);
+      calculateComparisons(transactionsData);
       console.log("✅ [StatisticsPage] Statistics calculated successfully");
     } catch (error) {
       console.error("❌ [StatisticsPage] Error loading data:", error);
@@ -199,6 +205,63 @@ export function StatisticsPage() {
 
     setMonthlyTrends(trends);
     console.log("✅ [StatisticsPage] Monthly trends calculated:", trends.length, "months");
+  };
+
+  /**
+   * Calculate comparison metrics between current and previous month
+   * @param {Transaction[]} transactions - Array of transactions to analyze
+   */
+  const calculateComparisons = (transactions: Transaction[]) => {
+    console.log("📊 [StatisticsPage] Calculating comparison metrics");
+    const now = new Date();
+    const currentMonthStart = startOfMonth(now);
+    const previousMonthStart = startOfMonth(subMonths(now, 1));
+    const previousMonthEnd = endOfMonth(subMonths(now, 1));
+
+    // Current month transactions
+    const currentMonthTransactions = transactions.filter((t) => {
+      const date = parseISO(t.transactionDate);
+      return date >= currentMonthStart;
+    });
+
+    // Previous month transactions
+    const previousMonthTransactions = transactions.filter((t) => {
+      const date = parseISO(t.transactionDate);
+      return date >= previousMonthStart && date <= previousMonthEnd;
+    });
+
+    // Calculate totals
+    const currentIncome = currentMonthTransactions
+      .filter((t) => t.isIncome)
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const previousIncome = previousMonthTransactions
+      .filter((t) => t.isIncome)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const currentExpenses = currentMonthTransactions
+      .filter((t) => !t.isIncome)
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const previousExpenses = previousMonthTransactions
+      .filter((t) => !t.isIncome)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Calculate percentage changes
+    const incomeChange = previousIncome > 0 
+      ? ((currentIncome - previousIncome) / previousIncome) * 100 
+      : 0;
+    
+    const expenseChange = previousExpenses > 0 
+      ? ((currentExpenses - previousExpenses) / previousExpenses) * 100 
+      : 0;
+    
+    const transactionChange = previousMonthTransactions.length > 0
+      ? ((currentMonthTransactions.length - previousMonthTransactions.length) / previousMonthTransactions.length) * 100
+      : 0;
+
+    setComparisonData({ incomeChange, expenseChange, transactionChange });
+    console.log("✅ [StatisticsPage] Comparisons calculated:", { incomeChange, expenseChange, transactionChange });
   };
 
   const maxValue = Math.max(
@@ -413,7 +476,7 @@ export function StatisticsPage() {
               </Card>
 
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -427,9 +490,27 @@ export function StatisticsPage() {
                     <p className="text-3xl font-bold text-slate-900">
                       {transactions.length}
                     </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Registradas en el sistema
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="text-sm text-slate-500">
+                        Registradas en el sistema
+                      </p>
+                      {comparisonData.transactionChange !== 0 && (
+                        <span
+                          className={`text-xs font-semibold flex items-center gap-1 ${
+                            comparisonData.transactionChange > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {comparisonData.transactionChange > 0 ? (
+                            <ArrowUpRight className="w-3 h-3" />
+                          ) : (
+                            <ArrowDownRight className="w-3 h-3" />
+                          )}
+                          {Math.abs(comparisonData.transactionChange).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -454,9 +535,27 @@ export function StatisticsPage() {
                           ).toFixed(2)
                         : "0.00"}
                     </p>
-                    <p className="text-sm text-slate-500 mt-1">
-                      Ingresos promedio
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="text-sm text-slate-500">
+                        Ingresos promedio
+                      </p>
+                      {comparisonData.incomeChange !== 0 && (
+                        <span
+                          className={`text-xs font-semibold flex items-center gap-1 ${
+                            comparisonData.incomeChange > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {comparisonData.incomeChange > 0 ? (
+                            <ArrowUpRight className="w-3 h-3" />
+                          ) : (
+                            <ArrowDownRight className="w-3 h-3" />
+                          )}
+                          {Math.abs(comparisonData.incomeChange).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -476,6 +575,47 @@ export function StatisticsPage() {
                     <p className="text-sm text-slate-500 mt-1">
                       Con gastos registrados
                     </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-medium text-slate-600">
+                        Cambio en Gastos
+                      </CardTitle>
+                      <TrendingDown className="w-5 h-5 text-amber-500" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p
+                      className={`text-3xl font-bold ${
+                        comparisonData.expenseChange > 0
+                          ? "text-red-600"
+                          : comparisonData.expenseChange < 0
+                          ? "text-green-600"
+                          : "text-slate-900"
+                      }`}
+                    >
+                      {comparisonData.expenseChange > 0 ? "+" : ""}
+                      {comparisonData.expenseChange.toFixed(1)}%
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="text-sm text-slate-500">
+                        vs. mes anterior
+                      </p>
+                      {comparisonData.expenseChange !== 0 && (
+                        <span
+                          className={`text-xs font-semibold flex items-center gap-1 ${
+                            comparisonData.expenseChange < 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {comparisonData.expenseChange < 0 ? "Mejora" : "Aumento"}
+                        </span>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
