@@ -324,7 +324,12 @@ export function StatisticsPage() {
                         Ingresos vs Gastos - Últimos 6 meses
                       </p>
                     </div>
-                    <TrendingUp className="w-6 h-6 text-blue-500" />
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-6 h-6 text-blue-500" />
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                        Comparativa histórica
+                      </span>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -390,10 +395,15 @@ export function StatisticsPage() {
                         Gastos por Categoría
                       </CardTitle>
                       <p className="text-sm text-slate-600 mt-1">
-                        Distribución de tus gastos
+                        Distribución de tus gastos - Top 8 categorías
                       </p>
                     </div>
-                    <PieChart className="w-6 h-6 text-blue-500" />
+                    <div className="flex items-center gap-2">
+                      <PieChart className="w-6 h-6 text-blue-500" />
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                        Análisis por etiquetas
+                      </span>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
