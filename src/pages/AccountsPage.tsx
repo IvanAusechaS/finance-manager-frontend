@@ -86,33 +86,42 @@ export function AccountsPage() {
   const loadData = async () => {
     try {
       setIsLoading(true);
+      console.log("📊 [AccountsPage] Iniciando carga de datos");
+      
       // First, get user profile to get userId
       const profileResponse = await authApi.getProfile();
       const currentUserId = profileResponse.user.id;
       setUserId(currentUserId);
+      console.log("✅ [AccountsPage] Usuario autenticado, ID:", currentUserId);
 
       // Then load categories
       const categoriesData = await categoryApi.getAll();
       setCategories(categoriesData);
+      console.log("✅ [AccountsPage] Categorías cargadas:", categoriesData.length);
 
       // If categories exist, try to load accounts
       if (categoriesData.length > 0) {
         try {
           const accountsData = await accountApi.getAll(currentUserId);
           setAccounts(accountsData);
+          console.log("✅ [AccountsPage] Cuentas cargadas:", accountsData.length);
         } catch (accountError) {
           // If account endpoint doesn't exist yet, just set empty array
-          console.warn("Account endpoint not available yet:", accountError);
+          console.warn("⚠️ [AccountsPage] Endpoint de cuentas no disponible:", accountError);
           setAccounts([]);
         }
+      } else {
+        console.warn("⚠️ [AccountsPage] No hay categorías disponibles");
       }
     } catch (error) {
       const apiError = error as ApiError;
+      console.error("❌ [AccountsPage] Error al cargar datos:", error);
       toast.error("Error al cargar datos", {
         description: apiError.message || "No se pudieron cargar las categorías",
       });
     } finally {
       setIsLoading(false);
+      console.log("🏁 [AccountsPage] Carga de datos completada");
     }
   };
 
@@ -120,10 +129,12 @@ export function AccountsPage() {
     e.preventDefault();
 
     if (!userId) {
+      console.error("❌ [AccountsPage] Error: Usuario no identificado");
       toast.error("Error: Usuario no identificado");
       return;
     }
 
+    console.log("➕ [AccountsPage] Creando cuenta:", formData);
     setIsSubmitting(true);
 
     try {
@@ -134,13 +145,14 @@ export function AccountsPage() {
         userId: userId,
       });
 
+      console.log("✅ [AccountsPage] Cuenta creada exitosamente:", response.account.id);
       toast.success("Cuenta creada exitosamente");
       setAccounts([...accounts, response.account]);
       setIsCreateOpen(false);
       setFormData({ name: "", money: "", categoryId: "" });
     } catch (error) {
       const apiError = error as ApiError;
-      console.error("Error creating account:", error);
+      console.error("❌ [AccountsPage] Error al crear cuenta:", error);
       toast.error("Error al crear cuenta", {
         description: apiError.message || "No se pudo crear la cuenta",
         duration: 5000,
