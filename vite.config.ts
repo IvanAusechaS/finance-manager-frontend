@@ -22,39 +22,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    chunkSizeWarningLimit: 1000,
-    commonjsOptions: {
-      include: [/recharts/, /node_modules/],
-      transformMixedEsModules: true,
-    },
+    chunkSizeWarningLimit: 2000,
+    // Disable code splitting completely to avoid module initialization order issues
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // React ecosystem - must be loaded first
-          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
-            return 'react-vendor';
-          }
-          // DO NOT separate recharts - it must be in the main bundle to ensure React is available
-          // Recharts will be bundled with the main code, not in a separate chunk
-          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-')) {
-            return undefined; // Force inline - don't create separate chunk
-          }
-          if (id.includes('node_modules/react-router-dom')) {
-            return 'react-router';
-          }
-          // Radix UI components
-          if (id.includes('node_modules/@radix-ui')) {
-            return 'ui-vendor';
-          }
-          // Date utilities
-          if (id.includes('node_modules/date-fns')) {
-            return 'date-utils';
-          }
-          // Lucide icons
-          if (id.includes('node_modules/lucide-react')) {
-            return 'icons';
-          }
-        },
+        manualChunks: undefined,
       },
     },
   },
