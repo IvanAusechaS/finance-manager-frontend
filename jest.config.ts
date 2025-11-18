@@ -1,25 +1,27 @@
-import type { Config } from 'jest';
+import type { Config } from "jest";
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
-  roots: ['<rootDir>/src'],
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
+  roots: ["<rootDir>/src"],
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/__mocks__/fileMock.ts',
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+    "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/src/__mocks__/fileMock.ts",
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
   collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!src/main.tsx', // Exclude entry point
-    '!src/vite-env.d.ts', // Exclude Vite types
-    '!src/**/*.d.ts', // Exclude type definitions
-    '!src/**/__mocks__/**', // Exclude mocks
-    '!src/**/*.test.{ts,tsx}', // Exclude test files
-    '!src/**/*.spec.{ts,tsx}', // Exclude spec files
+    "src/**/*.{ts,tsx}",
+    "!src/main.tsx", // Exclude entry point
+    "!src/vite-env.d.ts", // Exclude Vite types
+    "!src/**/*.d.ts", // Exclude type definitions
+    "!src/**/__mocks__/**", // Exclude mocks
+    "!src/**/*.test.{ts,tsx}", // Exclude test files
+    "!src/**/*.spec.{ts,tsx}", // Exclude spec files
   ],
-  coverageReporters: ['text', 'lcov', 'html'],
-  coverageDirectory: 'coverage',
+  coverageReporters: ["text", "lcov", "html"],
+  coverageDirectory: "coverage",
   coverageThreshold: {
     global: {
       branches: 80,
@@ -28,14 +30,14 @@ const config: Config = {
       statements: 80,
     },
   },
-  testMatch: [
-    '**/__tests__/**/*.{ts,tsx}',
-    '**/*.{test,spec}.{ts,tsx}',
-  ],
+  testMatch: ["**/__tests__/**/*.{ts,tsx}", "**/*.{test,spec}.{ts,tsx}"],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: './tsconfig.test.json',
-    }],
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        tsconfig: "./tsconfig.test.json",
+      },
+    ],
   },
 };
 
