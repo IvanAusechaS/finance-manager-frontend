@@ -94,32 +94,39 @@ export function CalendarPage() {
 
   // Load data
   useEffect(() => {
+    console.log("🔄 [CalendarPage] Effect triggered, loading data for account:", selectedAccount);
     loadData();
   }, [selectedAccount]);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
+      console.log("📊 [CalendarPage] Iniciando carga de datos");
 
       // Get user profile first to get userId
       const profileResponse = await authApi.getProfile();
       const userId = profileResponse.user.id;
+      console.log("✅ [CalendarPage] Usuario autenticado, ID:", userId);
 
       // Load accounts
       const accountsData = await accountApi.getAll(userId);
       setAccounts(accountsData);
+      console.log("✅ [CalendarPage] Cuentas cargadas:", accountsData.length);
 
       // Load transactions
       const filters: { accountId?: number } = {};
       if (selectedAccount !== "all") {
         filters.accountId = parseInt(selectedAccount);
+        console.log("🔍 [CalendarPage] Aplicando filtro de cuenta:", selectedAccount);
       }
 
       const transactionsData = await transactionApi.getAll(filters);
       setTransactions(transactionsData);
+      console.log("✅ [CalendarPage] Transacciones cargadas:", transactionsData.length);
 
       // Calculate monthly stats
       calculateMonthlyStats(transactionsData, accountsData);
+      console.log("📈 [CalendarPage] Estadísticas mensuales calculadas");
 
       // Get recent transactions (last 5)
       const sorted = [...transactionsData].sort(
