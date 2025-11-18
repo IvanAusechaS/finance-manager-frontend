@@ -10,6 +10,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'recharts'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
@@ -17,7 +20,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          // React ecosystem
+          // React ecosystem - must be loaded first
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
             return 'react-vendor';
           }
@@ -28,9 +31,12 @@ export default defineConfig({
           if (id.includes('node_modules/@radix-ui')) {
             return 'ui-vendor';
           }
-          // Chart libraries
+          // Chart libraries - include with React to avoid initialization order issues
+          // Keep recharts in vendor chunk to ensure React loads first
           if (id.includes('node_modules/recharts') || id.includes('node_modules/d3-')) {
-            return 'charts';
+            // Don't separate recharts - let it be bundled with the main code
+            // This ensures React is always available when recharts initializes
+            return null;
           }
           // Date utilities
           if (id.includes('node_modules/date-fns')) {
