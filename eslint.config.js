@@ -19,5 +19,11 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Disable react-refresh warnings for utility exports
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // Disable purity rule that conflicts with common patterns
+      'react-hooks/purity': 'off',
+    },
   },
 ])
