@@ -53,20 +53,25 @@ export function LoginPage() {
    */
   const validateField = (name: string, value: string): string => {
     switch (name) {
-      case "email":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+      case "email": {
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
-        if (!validateEmail(value)) {
-          return "Formato de correo inválido";
+        const emailError = validateEmail(value);
+        if (emailError) {
+          return emailError;
         }
         return "";
+      }
 
-      case "password":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+      case "password": {
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
         return "";
+      }
 
       default:
         return "";

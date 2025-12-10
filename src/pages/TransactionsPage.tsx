@@ -387,7 +387,14 @@ export function TransactionsPage() {
       };
 
       if (editingTransaction) {
-        await transactionApi.update(editingTransaction.id, dataToSubmit);
+        const transactionId = Number(editingTransaction.id);
+        if (isNaN(transactionId)) {
+          console.error("Invalid transaction ID:", editingTransaction.id);
+          toast.error("ID de transacción inválido");
+          return;
+        }
+        console.log("Updating transaction with ID:", transactionId);
+        await transactionApi.update(transactionId, dataToSubmit);
         toast.success("Transacción actualizada correctamente");
       } else {
         await transactionApi.create(dataToSubmit);

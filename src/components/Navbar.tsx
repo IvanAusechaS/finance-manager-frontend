@@ -91,10 +91,20 @@ export function Navbar() {
       setUser(response.user);
       setIsAuthenticated(true);
       console.log("✅ [Navbar] Usuario autenticado:", response.user.nickname);
-    } catch {
+    } catch (error) {
+      // Silenciar errores de autenticación (401/500) - es normal cuando el usuario no está logueado
+      const apiError = error as { statusCode?: number; status?: number };
+      const status = apiError.statusCode || apiError.status;
+      
+      // Solo loguear errores inesperados (no 401)
+      if (status !== 401 && status !== 0) {
+        console.error("❌ [Navbar] Error al verificar autenticación:", error);
+      } else {
+        console.log("❌ [Navbar] Usuario no autenticado");
+      }
+      
       setUser(null);
       setIsAuthenticated(false);
-      console.log("❌ [Navbar] Usuario no autenticado");
     } finally {
       setIsLoading(false);
     }

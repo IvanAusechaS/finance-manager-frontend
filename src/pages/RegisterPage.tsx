@@ -74,27 +74,34 @@ export function RegisterPage() {
    */
   const validateField = (name: string, value: string): string => {
     switch (name) {
-      case "nickname":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+      case "nickname": {
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
-        if (!validateName(value)) {
-          return "El nombre debe tener al menos 2 caracteres y solo letras";
+        const nameError = validateName(value);
+        if (nameError) {
+          return nameError;
         }
         return "";
+      }
 
-      case "email":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+      case "email": {
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
-        if (!validateEmail(value)) {
-          return "Formato de correo inválido";
+        const emailError = validateEmail(value);
+        if (emailError) {
+          return emailError;
         }
         return "";
+      }
 
       case "password": {
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
         const passwordErrors = getPasswordErrors(value);
         if (passwordErrors.length > 0) {
@@ -103,14 +110,16 @@ export function RegisterPage() {
         return "";
       }
 
-      case "confirmPassword":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
+      case "confirmPassword": {
+        const requiredError = validateRequired(value);
+        if (requiredError) {
+          return requiredError;
         }
         if (value !== formData.password) {
           return "Las contraseñas no coinciden";
         }
         return "";
+      }
 
       default:
         return "";

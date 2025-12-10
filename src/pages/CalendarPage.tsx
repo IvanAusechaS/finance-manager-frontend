@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Calendar } from "../components/ui/calendar";
+import { SimpleCalendar } from "../components/ui/SimpleCalendar";
 import {
   Select,
   SelectContent,
@@ -412,13 +412,12 @@ export function CalendarPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border w-full"
-                    locale={es}
-                  />
+                  <div className="rounded-md border p-4 w-full bg-white">
+                    <SimpleCalendar
+                      selected={date}
+                      onSelect={setDate}
+                    />
+                  </div>
 
                   {/* Transactions for selected day */}
                   {date && (
