@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { tagApi, accountApi } from "../lib/api";
 import type { Tag, Account } from "../lib/api";
 import {

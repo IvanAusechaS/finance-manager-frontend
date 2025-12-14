@@ -51,13 +51,6 @@ export function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  console.log(
-    "🧭 [Navbar] Ruta actual:",
-    location.pathname,
-    "Auth:",
-    isAuthenticated
-  );
-
   // Determinar si estamos en dashboard o landing
   const isDashboardRoute = [
     "/dashboard",
@@ -85,16 +78,13 @@ export function Navbar() {
   }, [location.pathname]);
 
   const checkAuth = async () => {
-    console.log("👤 [Navbar] Verificando autenticación");
     try {
       const response = await authApi.getProfile();
       setUser(response.user);
       setIsAuthenticated(true);
-      console.log("✅ [Navbar] Usuario autenticado:", response.user.nickname);
     } catch {
       setUser(null);
       setIsAuthenticated(false);
-      console.log("❌ [Navbar] Usuario no autenticado");
     } finally {
       setIsLoading(false);
     }
@@ -127,13 +117,11 @@ export function Navbar() {
   }, [isMenuOpen, isDashboardRoute]);
 
   const handleLogout = async () => {
-    console.log("🚪 [Navbar] Cerrando sesión");
     try {
       await authApi.logout();
       setIsAuthenticated(false);
       setUser(null);
       toast.success("Sesión cerrada correctamente");
-      console.log("✅ [Navbar] Sesión cerrada exitosamente");
       navigate("/");
     } catch (error) {
       console.error("❌ [Navbar] Error al cerrar sesión:", error);
@@ -151,7 +139,6 @@ export function Navbar() {
   };
 
   const handleMenuItemClick = () => {
-    console.log("📱 [Navbar] Cerrando menú móvil");
     setIsMenuOpen(false);
   };
 
@@ -181,23 +168,20 @@ export function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
-            {/* Hamburger Button - Solo visible en mobile/tablet y cuando está autenticado */}
-            {isAuthenticated && (
-              <button
-                onClick={() => {
-                  console.log("🍔 [Navbar] Toggle menú móvil:", !isMenuOpen);
-                  setIsMenuOpen(!isMenuOpen);
-                }}
-                className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors"
-                aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-              >
-                {isMenuOpen ? (
-                  <X className="w-5 h-5 text-slate-700" />
-                ) : (
-                  <Menu className="w-5 h-5 text-slate-700" />
-                )}
-              </button>
-            )}
+            {/* Hamburger Button - Solo visible en mobile/tablet */}
+            <button
+              onClick={() => {
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors"
+              aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            >
+              {isMenuOpen ? (
+                <X className="w-5 h-5 text-slate-700" />
+              ) : (
+                <Menu className="w-5 h-5 text-slate-700" />
+              )}
+            </button>
 
             {/* User Profile */}
             {isLoading ? (
@@ -265,7 +249,6 @@ export function Navbar() {
             <div
               className="lg:hidden fixed inset-0 top-16 bg-black/20 z-40"
               onClick={() => {
-                console.log("📱 [Navbar] Cerrando menú por backdrop");
                 setIsMenuOpen(false);
               }}
             />

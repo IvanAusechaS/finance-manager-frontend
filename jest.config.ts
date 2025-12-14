@@ -11,7 +11,8 @@ const config: Config = {
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/src/__mocks__/fileMock.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^.*/lib/env$": "<rootDir>/src/__mocks__/env.ts",
-    "^.*\\/lib\\/env$": "<rootDir>/src/__mocks__/env.ts",
+    "\\.\/lib\/env$": "<rootDir>/src/__mocks__/env.ts",
+    "^.*\\/env$": "<rootDir>/src/__mocks__/env.ts",
   },
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
@@ -34,6 +35,10 @@ const config: Config = {
     },
   },
   testMatch: ["**/__tests__/**/*.{ts,tsx}", "**/*.{test,spec}.{ts,tsx}"],
+  transformIgnorePatterns: [
+    "node_modules/",
+    "src/lib/env\\.ts$" // Don't transform env.ts - it will be mocked
+  ],
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",

@@ -30,7 +30,7 @@ import {
   subMonths,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 
 interface CategoryStats {
   name: string;
