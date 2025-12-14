@@ -150,7 +150,7 @@ export function LoginPage() {
         });
         setErrors({
           email: "Verifica tus credenciales",
-          password: "Verifica tus credenciales",
+          password: "",
         });
       } else if (apiError.statusCode === 423) {
         toast.error("Cuenta bloqueada", {
