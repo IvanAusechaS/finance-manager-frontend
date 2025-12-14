@@ -5,9 +5,9 @@ import { es } from "date-fns/locale";
 import { cn } from "./utils";
 
 interface SimpleCalendarProps {
-  selected?: Date;
-  onSelect?: (date: Date) => void;
-  className?: string;
+  readonly selected?: Date;
+  readonly onSelect?: (date: Date) => void;
+  readonly className?: string;
 }
 
 export function SimpleCalendar({ selected, onSelect, className }: SimpleCalendarProps) {
@@ -82,9 +82,9 @@ export function SimpleCalendar({ selected, onSelect, className }: SimpleCalendar
 
       {/* Weekday headers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '2px' }}>
-        {weekDays.map((day, index) => (
+        {weekDays.map((day) => (
           <div
-            key={index}
+            key={`weekday-${day}`}
             style={{ textAlign: 'center', fontSize: '11px', fontWeight: '600', color: '#6b7280', padding: '2px 0' }}
           >
             {day}
@@ -94,14 +94,29 @@ export function SimpleCalendar({ selected, onSelect, className }: SimpleCalendar
 
       {/* Calendar grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
-        {allDays.map((day, index) => {
+        {allDays.map((day) => {
           const isCurrentMonth = isSameMonth(day, currentMonth);
           const isSelected = selected && isSameDay(day, selected);
           const isToday = isSameDay(day, new Date());
 
+          // Extract nested ternaries for better readability
+          let textColor = '#111827';
+          if (isSelected) {
+            textColor = 'white';
+          } else if (!isCurrentMonth) {
+            textColor = '#d1d5db';
+          }
+
+          let bgColor = 'transparent';
+          if (isSelected) {
+            bgColor = '#2563eb';
+          } else if (isToday) {
+            bgColor = '#dbeafe';
+          }
+
           return (
             <button
-              key={index}
+              key={`day-${day.getTime()}`}
               onClick={() => handleDateClick(day)}
               style={{
                 width: '40px',
@@ -112,8 +127,8 @@ export function SimpleCalendar({ selected, onSelect, className }: SimpleCalendar
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                color: !isCurrentMonth ? '#d1d5db' : isSelected ? 'white' : '#111827',
-                backgroundColor: isSelected ? '#2563eb' : isToday ? '#dbeafe' : 'transparent',
+                color: textColor,
+                backgroundColor: bgColor,
                 fontWeight: isSelected || isToday ? '600' : '400',
               }}
               onMouseEnter={(e) => {
@@ -122,9 +137,11 @@ export function SimpleCalendar({ selected, onSelect, className }: SimpleCalendar
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isSelected) {
-                  e.currentTarget.style.backgroundColor = isToday ? '#dbeafe' : 'transparent';
+                if (isSelected) {
+                  return;
                 }
+                const resetColor = isToday ? '#dbeafe' : 'transparent';
+                e.currentTarget.style.backgroundColor = resetColor;
               }}
             >
               {format(day, "d")}

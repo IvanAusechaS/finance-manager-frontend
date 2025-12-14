@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
               )}
 
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => globalThis.location.reload()}
                 style={{
                   backgroundColor: "#2563eb",
                   color: "white",
@@ -99,6 +99,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 }}
                 onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#1d4ed8"}
                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+                onFocus={(e) => e.currentTarget.style.backgroundColor = "#1d4ed8"}
+                onBlur={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
               >
                 Refresh Page
               </button>
