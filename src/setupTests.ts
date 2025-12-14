@@ -5,10 +5,10 @@
 import "@testing-library/jest-dom";
 
 // Polyfills for jsdom environment
-import { TextEncoder, TextDecoder } from "util";
+import { TextEncoder, TextDecoder } from "node:util";
 
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+globalThis.TextEncoder = TextEncoder;
+globalThis.TextDecoder = TextDecoder as typeof globalThis.TextDecoder;
 
 // Mock the env module to avoid import.meta issues in Jest
 jest.mock("./lib/env", () => ({

@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { tagApi, accountApi } from "../lib/api";
 import type { Tag, Account } from "../lib/api";
 import {
@@ -498,16 +498,14 @@ export function TagsPage() {
                     Cancelar
                   </Button>
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? (
+                    {submitting && (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Guardando...
                       </>
-                    ) : editingTag ? (
-                      "Actualizar"
-                    ) : (
-                      "Crear Etiqueta"
                     )}
+                    {!submitting && editingTag && "Actualizar"}
+                    {!submitting && !editingTag && "Crear Etiqueta"}
                   </Button>
                 </DialogFooter>
               </form>

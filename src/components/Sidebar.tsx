@@ -36,8 +36,8 @@ interface UserProfile {
 }
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
@@ -46,15 +46,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  console.log("📱 [Sidebar] Estado:", { isOpen, pathname: location.pathname });
-
   // Cargar perfil de usuario
   useEffect(() => {
     const loadUserProfile = async () => {
-      console.log("👤 [Sidebar] Cargando perfil de usuario");
       try {
         const response = await authApi.getProfile();
-        console.log("✅ [Sidebar] Perfil cargado:", response.user.nickname);
         setUser(response.user);
       } catch (error) {
         console.error("❌ [Sidebar] Error al cargar perfil:", error);
@@ -71,10 +67,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      console.log("🔒 [Sidebar] Scroll bloqueado");
     } else {
       document.body.style.overflow = "";
-      console.log("🔓 [Sidebar] Scroll desbloqueado");
     }
 
     return () => {
@@ -83,10 +77,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   }, [isOpen]);
 
   const handleLogout = async () => {
-    console.log("🚪 [Sidebar] Cerrando sesión");
     try {
       await authApi.logout();
-      console.log("✅ [Sidebar] Sesión cerrada exitosamente");
       toast.success("Sesión cerrada exitosamente");
       navigate("/login");
     } catch (error) {
@@ -95,8 +87,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     }
   };
 
-  const handleMenuItemClick = (path: string, label: string) => {
-    console.log(`🔗 [Sidebar] Navegando a: ${path} (${label})`);
+  const handleMenuItemClick = () => {
     onClose();
   };
 
@@ -116,7 +107,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => {
-            console.log("📱 [Sidebar] Cerrando por backdrop click");
             onClose();
           }}
           aria-hidden="true"
@@ -141,7 +131,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             to="/dashboard"
             className="flex items-center gap-3"
             onClick={() => {
-              console.log("🏠 [Sidebar] Navegando a dashboard desde logo");
               onClose();
             }}
           >
@@ -158,7 +147,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button
             onClick={() => {
-              console.log("❌ [Sidebar] Cerrando sidebar");
               onClose();
             }}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors"
@@ -178,7 +166,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => handleMenuItemClick(item.path, item.label)}
+                onClick={handleMenuItemClick}
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-lg
                   transition-all duration-200
