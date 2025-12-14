@@ -136,9 +136,6 @@ celerybeat.pid
 
 # Environments
 .env
-.env.local
-.env.production.local
-.env.development.local
 .envrc
 .venv
 env/
@@ -146,9 +143,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# Vercel
-.vercel
 
 # Spyder project settings
 .spyderproject

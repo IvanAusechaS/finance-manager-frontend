@@ -8,7 +8,11 @@ import { authApi } from "../lib/api";
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<{ id: number; nickname: string; email: string } | null>(null);
+  const [user, setUser] = useState<{
+    id: number;
+    nickname: string;
+    email: string;
+  } | null>(null);
 
   useEffect(() => {
     checkAuth();

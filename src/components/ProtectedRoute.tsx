@@ -20,6 +20,22 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       } catch {
         setIsAuthenticated(false);
         // Mostrar notificación solo si no estamos ya en login o registro
+        // y si no venimos de una redirección desde login
+        const fromLogin = sessionStorage.getItem("justLoggedIn");
+        if (fromLogin) {
+          sessionStorage.removeItem("justLoggedIn");
+          // Dar más tiempo para que las cookies se establezcan
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          // Reintentar la verificación
+          try {
+            await authApi.getProfile();
+            setIsAuthenticated(true);
+            return;
+          } catch {
+            // Si aún falla, continuar con el flujo normal
+          }
+        }
+
         if (
           location.pathname !== "/login" &&
           location.pathname !== "/register"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../lib/api";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { Button } from "../components/ui/button";
 import { Navbar } from "../components/Navbar";
 import {
@@ -136,6 +136,7 @@ export default function ProfilePage() {
       await authApi.changePassword({
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
+        confirmPassword: passwordForm.confirmPassword,
       });
 
       toast.success("Contraseña actualizada exitosamente");
@@ -210,347 +211,345 @@ export default function ProfilePage() {
     <>
       <Navbar />
       <div className="min-h-screen bg-slate-50">
-          {/* Header */}
-          <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-6">
-            <div className="max-w-4xl mx-auto">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                Gestión de Cuenta
-              </h1>
-              <p className="text-slate-600 mt-1">
-                Administra tu información personal y preferencias
-              </p>
+        {/* Header */}
+        <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-6">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+              Gestión de Cuenta
+            </h1>
+            <p className="text-slate-600 mt-1">
+              Administra tu información personal y preferencias
+            </p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-4 sm:px-8 py-6 max-w-4xl mx-auto space-y-6">
+          {/* Profile Information Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-6">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Información del Perfil
+                </h2>
+                <Button
+                  onClick={() => setIsEditDialogOpen(true)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar
+                </Button>
+              </div>
+
+              <div className="flex items-start gap-6">
+                {/* Avatar */}
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl font-bold text-white">
+                    {user && getInitials(user.nickname || user.email)}
+                  </span>
+                </div>
+
+                {/* User Info */}
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="w-4 h-4 text-slate-400" />
+                      <Label className="text-sm text-slate-600">
+                        Nombre de usuario
+                      </Label>
+                    </div>
+                    <p className="text-slate-900 font-medium">
+                      {user?.nickname || "Sin nombre"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Mail className="w-4 h-4 text-slate-400" />
+                      <Label className="text-sm text-slate-600">
+                        Correo electrónico
+                      </Label>
+                    </div>
+                    <p className="text-slate-900 font-medium">{user?.email}</p>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm text-slate-600">
+                      Miembro desde
+                    </Label>
+                    <p className="text-slate-900 font-medium">
+                      {user && formatDate(user.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="px-4 sm:px-8 py-6 max-w-4xl mx-auto space-y-6">
-            {/* Profile Information Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-slate-900">
-                    Información del Perfil
-                  </h2>
+          {/* Security Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-slate-900 mb-4">
+                Seguridad
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Lock className="w-5 h-5 text-slate-600" />
+                    <div>
+                      <p className="font-medium text-slate-900">Contraseña</p>
+                      <p className="text-sm text-slate-600">
+                        Última actualización: hace tiempo
+                      </p>
+                    </div>
+                  </div>
                   <Button
-                    onClick={() => setIsEditDialogOpen(true)}
+                    onClick={() => setIsPasswordDialogOpen(true)}
                     variant="outline"
                     size="sm"
                   >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Editar
+                    Cambiar
                   </Button>
                 </div>
-
-                <div className="flex items-start gap-6">
-                  {/* Avatar */}
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-bold text-white">
-                      {user && getInitials(user.nickname || user.email)}
-                    </span>
-                  </div>
-
-                  {/* User Info */}
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <User className="w-4 h-4 text-slate-400" />
-                        <Label className="text-sm text-slate-600">
-                          Nombre de usuario
-                        </Label>
-                      </div>
-                      <p className="text-slate-900 font-medium">
-                        {user?.nickname || "Sin nombre"}
-                      </p>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Mail className="w-4 h-4 text-slate-400" />
-                        <Label className="text-sm text-slate-600">
-                          Correo electrónico
-                        </Label>
-                      </div>
-                      <p className="text-slate-900 font-medium">
-                        {user?.email}
-                      </p>
-                    </div>
-
-                    <div>
-                      <Label className="text-sm text-slate-600">
-                        Miembro desde
-                      </Label>
-                      <p className="text-slate-900 font-medium">
-                        {user && formatDate(user.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-slate-900 mb-4">
-                  Seguridad
-                </h2>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Lock className="w-5 h-5 text-slate-600" />
-                      <div>
-                        <p className="font-medium text-slate-900">Contraseña</p>
-                        <p className="text-sm text-slate-600">
-                          Última actualización: hace tiempo
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={() => setIsPasswordDialogOpen(true)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Cambiar
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Danger Zone Card */}
-            <div className="bg-white rounded-xl shadow-sm border-2 border-red-200 overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-red-600 mb-2">
-                  Zona de Peligro
-                </h2>
-                <p className="text-slate-600 mb-4">
-                  Una vez que elimines tu cuenta, no hay vuelta atrás. Por
-                  favor, está seguro.
-                </p>
-
-                <Button
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  variant="destructive"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Eliminar Cuenta
-                </Button>
               </div>
             </div>
           </div>
 
-          {/* Edit Profile Dialog */}
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Editar Perfil</DialogTitle>
-                <DialogDescription>
-                  Actualiza tu información personal
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleEditProfile}>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nickname">Nombre de usuario</Label>
-                    <Input
-                      id="nickname"
-                      value={editForm.nickname}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, nickname: e.target.value })
-                      }
-                      placeholder="Tu nombre"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Correo electrónico</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={editForm.email}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, email: e.target.value })
-                      }
-                      placeholder="tu@email.com"
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsEditDialogOpen(false)}
-                    disabled={isSubmitting}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Guardando..." : "Guardar cambios"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {/* Danger Zone Card */}
+          <div className="bg-white rounded-xl shadow-sm border-2 border-red-200 overflow-hidden">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-red-600 mb-2">
+                Zona de Peligro
+              </h2>
+              <p className="text-slate-600 mb-4">
+                Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor,
+                está seguro.
+              </p>
 
-          {/* Change Password Dialog */}
-          <Dialog
-            open={isPasswordDialogOpen}
-            onOpenChange={setIsPasswordDialogOpen}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Cambiar Contraseña</DialogTitle>
-                <DialogDescription>
-                  Ingresa tu contraseña actual y la nueva contraseña
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleChangePassword}>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Contraseña actual</Label>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          currentPassword: e.target.value,
-                        })
-                      }
-                      placeholder="Tu contraseña actual"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">Nueva contraseña</Label>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={passwordForm.newPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          newPassword: e.target.value,
-                        })
-                      }
-                      placeholder="Nueva contraseña"
-                    />
-                    <p className="text-xs text-slate-600">
-                      Mínimo 8 caracteres, con mayúscula, minúscula, número y
-                      carácter especial
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">
-                      Confirmar nueva contraseña
-                    </Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          confirmPassword: e.target.value,
-                        })
-                      }
-                      placeholder="Confirma tu nueva contraseña"
-                    />
-                  </div>
+              <Button
+                onClick={() => setIsDeleteDialogOpen(true)}
+                variant="destructive"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Eliminar Cuenta
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Edit Profile Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Perfil</DialogTitle>
+              <DialogDescription>
+                Actualiza tu información personal
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleEditProfile}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nickname">Nombre de usuario</Label>
+                  <Input
+                    id="nickname"
+                    value={editForm.nickname}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, nickname: e.target.value })
+                    }
+                    placeholder="Tu nombre"
+                  />
                 </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setIsPasswordDialogOpen(false);
+                <div className="space-y-2">
+                  <Label htmlFor="email">Correo electrónico</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, email: e.target.value })
+                    }
+                    placeholder="tu@email.com"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Guardando..." : "Guardar cambios"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Change Password Dialog */}
+        <Dialog
+          open={isPasswordDialogOpen}
+          onOpenChange={setIsPasswordDialogOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Cambiar Contraseña</DialogTitle>
+              <DialogDescription>
+                Ingresa tu contraseña actual y la nueva contraseña
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleChangePassword}>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Contraseña actual</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) =>
                       setPasswordForm({
-                        currentPassword: "",
-                        newPassword: "",
-                        confirmPassword: "",
-                      });
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Cambiando..." : "Cambiar contraseña"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          {/* Delete Account AlertDialog */}
-          <AlertDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="text-red-600">
-                  ¿Estás absolutamente seguro?
-                </AlertDialogTitle>
-                <AlertDialogDescription className="space-y-4">
-                  <p className="font-semibold text-slate-900">
-                    Esta acción no se puede deshacer. Esto eliminará
-                    permanentemente tu cuenta y todos tus datos asociados.
+                        ...passwordForm,
+                        currentPassword: e.target.value,
+                      })
+                    }
+                    placeholder="Tu contraseña actual"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nueva contraseña</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) =>
+                      setPasswordForm({
+                        ...passwordForm,
+                        newPassword: e.target.value,
+                      })
+                    }
+                    placeholder="Nueva contraseña"
+                  />
+                  <p className="text-xs text-slate-600">
+                    Mínimo 8 caracteres, con mayúscula, minúscula, número y
+                    carácter especial
                   </p>
-
-                  <div className="space-y-3 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="deletePassword">
-                        Ingresa tu contraseña para confirmar
-                      </Label>
-                      <Input
-                        id="deletePassword"
-                        type="password"
-                        value={deletePassword}
-                        onChange={(e) => setDeletePassword(e.target.value)}
-                        placeholder="Tu contraseña"
-                      />
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <input
-                        id="deleteConfirm"
-                        type="checkbox"
-                        checked={deleteConfirm}
-                        onChange={(e) => setDeleteConfirm(e.target.checked)}
-                        className="mt-1"
-                      />
-                      <Label
-                        htmlFor="deleteConfirm"
-                        className="text-sm font-normal cursor-pointer"
-                      >
-                        Entiendo que esta acción es irreversible y eliminará
-                        permanentemente mi cuenta y todos mis datos
-                      </Label>
-                    </div>
-                  </div>
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">
+                    Confirmar nueva contraseña
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) =>
+                      setPasswordForm({
+                        ...passwordForm,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                    placeholder="Confirma tu nueva contraseña"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => {
-                    setDeletePassword("");
-                    setDeleteConfirm(false);
+                    setIsPasswordDialogOpen(false);
+                    setPasswordForm({
+                      currentPassword: "",
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
                   }}
                   disabled={isSubmitting}
                 >
                   Cancelar
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeleteAccount}
-                  disabled={isSubmitting || !deletePassword || !deleteConfirm}
-                  className="bg-red-600 hover:bg-red-700 !text-white"
-                >
-                  {isSubmitting ? "Eliminando..." : "Eliminar mi cuenta"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Cambiando..." : "Cambiar contraseña"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Account AlertDialog */}
+        <AlertDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-red-600">
+                ¿Estás absolutamente seguro?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-4">
+                <p className="font-semibold text-slate-900">
+                  Esta acción no se puede deshacer. Esto eliminará
+                  permanentemente tu cuenta y todos tus datos asociados.
+                </p>
+
+                <div className="space-y-3 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="deletePassword">
+                      Ingresa tu contraseña para confirmar
+                    </Label>
+                    <Input
+                      id="deletePassword"
+                      type="password"
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      placeholder="Tu contraseña"
+                    />
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <input
+                      id="deleteConfirm"
+                      type="checkbox"
+                      checked={deleteConfirm}
+                      onChange={(e) => setDeleteConfirm(e.target.checked)}
+                      className="mt-1"
+                    />
+                    <Label
+                      htmlFor="deleteConfirm"
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      Entiendo que esta acción es irreversible y eliminará
+                      permanentemente mi cuenta y todos mis datos
+                    </Label>
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setDeletePassword("");
+                  setDeleteConfirm(false);
+                }}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteAccount}
+                disabled={isSubmitting || !deletePassword || !deleteConfirm}
+                className="bg-red-600 hover:bg-red-700 !text-white"
+              >
+                {isSubmitting ? "Eliminando..." : "Eliminar mi cuenta"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </>
   );

@@ -14,18 +14,10 @@ function Calendar({
   ...props
 }: React.ComponentProps<typeof DayPicker>) {
   return (
-    <div style={{ display: 'contents' }}>
-      <style>{`
-        .rdp-head_row,
-        .rdp-head_cell,
-        .rdp table thead {
-          display: none !important;
-        }
-      `}</style>
-      <DayPicker
-        showOutsideDays={showOutsideDays}
-        className={cn("p-3", className)}
-        classNames={{
+    <DayPicker
+      showOutsideDays={showOutsideDays}
+      className={cn("p-3", className)}
+      classNames={{
         months: "flex flex-col sm:flex-row gap-2",
         month: "flex flex-col gap-4",
         caption: "flex justify-center pt-1 relative items-center w-full",
@@ -38,8 +30,9 @@ function Calendar({
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-x-1",
-        head_row: "hidden",
-        head_cell: "hidden",
+        head_row: "flex",
+        head_cell:
+          "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
         cell: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-range-end)]:rounded-r-md",
@@ -73,8 +66,7 @@ function Calendar({
         },
       }}
       {...props}
-      />
-    </div>
+    />
   );
 }
 

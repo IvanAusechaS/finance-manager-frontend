@@ -29,50 +29,31 @@ import {
 } from "recharts";
 import useRedirect from "../basicFunctions/functions";
 import { useState, useEffect } from "react";
-import {
-  accountApi,
-  transactionApi,
-  authApi,
-  type Transaction,
-} from "../lib/api";
+import { accountApi, transactionApi, authApi } from "../lib/api";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
-
-interface MonthlyChartData {
-  name: string;
-  ingresos: number;
-  gastos: number;
-}
-
-interface CategoryChartData {
-  name: string;
-  value: number;
-  color: string;
-}
-
-interface RecentTransaction {
-  id: number;
-  description: string;
-  category: string;
-  amount: number;
-  date: string;
-  type: "income" | "expense";
-}
 
 export function DashboardPage() {
   console.log("📊 [DashboardPage] Componente montado");
   const { goToHome } = useRedirect();
 
   const [loading, setLoading] = useState(true);
+  // Unused state variables - reserved for future features
+  // const [userId, setUserId] = useState<number | null>(null);
+  // const [accounts, setAccounts] = useState<Account[]>([]);
+  // const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState({
     totalBalance: 0,
     monthIncome: 0,
     monthExpenses: 0,
     savings: 0,
   });
-  const [monthlyData, setMonthlyData] = useState<MonthlyChartData[]>([]);
-  const [categoryData, setCategoryData] = useState<CategoryChartData[]>([]);
-  const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -169,8 +150,8 @@ export function DashboardPage() {
       ];
 
       currentMonthTransactions
-        .filter((t: Transaction) => !t.isIncome)
-        .forEach((t: Transaction) => {
+        .filter((t) => !t.isIncome)
+        .forEach((t) => {
           const categoryName = t.tag?.name || "Sin categoría";
           categoryMap.set(
             categoryName,
@@ -184,26 +165,26 @@ export function DashboardPage() {
           value,
           color: colors[index % colors.length],
         }))
-        .sort((a: { name: string; value: number; color: string }, b: { name: string; value: number; color: string }) => b.value - a.value)
+        .sort((a, b) => b.value - a.value)
         .slice(0, 7);
 
       setCategoryData(categoryDataArray);
 
       // Get recent transactions (last 5)
-      const recentTxs: RecentTransaction[] = transactionsData
+      const recentTxs = [...transactionsData]
         .sort(
           (a, b) =>
             new Date(b.transactionDate).getTime() -
             new Date(a.transactionDate).getTime()
         )
         .slice(0, 5)
-        .map((t: Transaction) => ({
+        .map((t) => ({
           id: t.id,
           description: t.description || "Sin descripción",
           category: t.tag?.name || "Sin categoría",
           amount: t.isIncome ? t.amount : -t.amount,
           date: format(new Date(t.transactionDate), "yyyy-MM-dd"),
-          type: (t.isIncome ? "income" : "expense") as "income" | "expense",
+          type: t.isIncome ? "income" : "expense",
         }));
 
       setRecentTransactions(recentTxs);
@@ -304,18 +285,19 @@ export function DashboardPage() {
                     <div className="text-slate-900 mb-1">{stat.value}</div>
                     {stat.change && (
                       <div className="flex items-center gap-3 text-sm">
-                        {stat.trend === "up" ? (
+                        {stat.trend === "up" && (
                           <ArrowUpRight className="w-4 h-4 text-green-600" />
-                        ) : stat.trend === "down" ? (
+                        )}
+                        {stat.trend === "down" && (
                           <ArrowDownRight className="w-4 h-4 text-red-600" />
-                        ) : null}
+                        )}
                         <span
                           className={
                             stat.trend === "up"
                               ? "text-green-600"
                               : stat.trend === "down"
-                              ? "text-red-600"
-                              : "text-slate-600"
+                                ? "text-red-600"
+                                : "text-slate-600"
                           }
                         >
                           {stat.change}
@@ -396,8 +378,8 @@ export function DashboardPage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      {categoryData.map((entry) => (
+                        <Cell key={`cell-${entry.name}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />

@@ -21,7 +21,7 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import {
   validateEmail,
   validateRequired,
@@ -74,34 +74,27 @@ export function RegisterPage() {
    */
   const validateField = (name: string, value: string): string => {
     switch (name) {
-      case "nickname": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+      case "nickname":
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
-        const nameError = validateName(value);
-        if (nameError) {
-          return nameError;
+        if (!validateName(value)) {
+          return "El nombre debe tener al menos 2 caracteres y solo letras";
         }
         return "";
-      }
 
-      case "email": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+      case "email":
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
-        const emailError = validateEmail(value);
-        if (emailError) {
-          return emailError;
+        if (!validateEmail(value)) {
+          return "Formato de correo inválido";
         }
         return "";
-      }
 
       case "password": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
         const passwordErrors = getPasswordErrors(value);
         if (passwordErrors.length > 0) {
@@ -110,16 +103,14 @@ export function RegisterPage() {
         return "";
       }
 
-      case "confirmPassword": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+      case "confirmPassword":
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
         if (value !== formData.password) {
           return "Las contraseñas no coinciden";
         }
         return "";
-      }
 
       default:
         return "";
@@ -196,7 +187,7 @@ export function RegisterPage() {
         confirmPassword: formData.confirmPassword,
       });
 
-      toast.success(`¡Bienvenido, ${response.user?.nickname || 'Usuario'}!`, {
+      toast.success(`¡Bienvenido, ${response.user.nickname}!`, {
         description: "Tu cuenta ha sido creada exitosamente",
         icon: <CheckCircle2 />,
       });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Navbar } from "../components/Navbar";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -21,13 +21,12 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { validateEmail, validateRequired } from "../lib/validations";
 import { authApi } from "../lib/api";
 import type { ApiError } from "../lib/api";
 
 export function LoginPage() {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -53,25 +52,20 @@ export function LoginPage() {
    */
   const validateField = (name: string, value: string): string => {
     switch (name) {
-      case "email": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+      case "email":
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
-        const emailError = validateEmail(value);
-        if (emailError) {
-          return emailError;
+        if (!validateEmail(value)) {
+          return "Formato de correo inválido";
         }
         return "";
-      }
 
-      case "password": {
-        const requiredError = validateRequired(value);
-        if (requiredError) {
-          return requiredError;
+      case "password":
+        if (!validateRequired(value)) {
+          return "Este campo es requerido";
         }
         return "";
-      }
 
       default:
         return "";
@@ -138,11 +132,14 @@ export function LoginPage() {
         icon: <CheckCircle2 />,
       });
 
-      // Pequeña pausa para asegurar que las cookies se establezcan
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Marcar que acabamos de hacer login para evitar verificaciones prematuras
+      sessionStorage.setItem("justLoggedIn", "true");
 
-      // Redirigir a dashboard
-      navigate("/dashboard", { replace: true });
+      // Pausa para asegurar que las cookies se establezcan correctamente
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Forzar recarga para asegurar que las cookies estén disponibles
+      window.location.href = "/dashboard";
     } catch (error) {
       // Manejo de errores del servidor
       const apiError = error as ApiError;
@@ -153,7 +150,7 @@ export function LoginPage() {
         });
         setErrors({
           email: "Verifica tus credenciales",
-          password: "Verifica tus credenciales",
+          password: "",
         });
       } else if (apiError.statusCode === 423) {
         toast.error("Cuenta bloqueada", {

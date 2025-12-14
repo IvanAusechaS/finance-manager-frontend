@@ -112,7 +112,7 @@ const articles = [
   },
   {
     id: 4,
-    title: "Por Qué Finance Manager es tu Mejor Aliado Financiero",
+    title: "Por Qué Finanz es tu Mejor Aliado Financiero",
     excerpt:
       "Descubre cómo nuestra plataforma simplifica la gestión de tus finanzas personales y te ayuda a alcanzar tus metas económicas más rápido.",
     date: "9 de Noviembre, 2025",
@@ -122,7 +122,7 @@ const articles = [
     content: [
       {
         subtitle: "Simplicidad que Impulsa la Acción",
-        text: "Sabemos que la gestión financiera puede ser abrumadora. Por eso diseñamos Finance Manager con una interfaz intuitiva que cualquiera puede usar desde el primer día. No necesitas ser un experto en finanzas para tomar el control de tu dinero.",
+        text: "Sabemos que la gestión financiera puede ser abrumadora. Por eso diseñamos Finanz con una interfaz intuitiva que cualquiera puede usar desde el primer día. No necesitas ser un experto en finanzas para tomar el control de tu dinero.",
       },
       {
         subtitle: "Visión Completa en Tiempo Real",
@@ -142,7 +142,7 @@ const articles = [
       },
       {
         subtitle: "Gratis y Accesible",
-        text: "Creemos que todos merecen herramientas de calidad para gestionar su dinero. Finance Manager es completamente gratuito, sin costos ocultos ni suscripciones premium que limiten funcionalidades esenciales.",
+        text: "Creemos que todos merecen herramientas de calidad para gestionar su dinero. Finanz es completamente gratuito, sin costos ocultos ni suscripciones premium que limiten funcionalidades esenciales.",
       },
     ],
   },
@@ -152,9 +152,9 @@ export function ArticlesPage() {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
 
   const article =
-    selectedArticle !== null
-      ? articles.find((a) => a.id === selectedArticle)
-      : null;
+    selectedArticle === null
+      ? null
+      : articles.find((a) => a.id === selectedArticle);
 
   if (article) {
     const IconComponent = article.icon;
@@ -206,8 +206,8 @@ export function ArticlesPage() {
             </p>
 
             <div className="space-y-8">
-              {article.content.map((section, index) => (
-                <div key={index} className="space-y-3">
+              {article.content.map((section) => (
+                <div key={`section-${article.id}-${section.subtitle}`} className="space-y-3">
                   <h2 className="text-2xl font-bold text-slate-900">
                     {section.subtitle}
                   </h2>
@@ -226,7 +226,7 @@ export function ArticlesPage() {
                 ¿Listo para tomar el control de tus finanzas?
               </h3>
               <p className="text-white/90 mb-4">
-                Empieza hoy mismo con Finance Manager y transforma tu futuro
+                Empieza hoy mismo con Finanz y transforma tu futuro
                 financiero.
               </p>
               <Link to="/register">
@@ -275,9 +275,10 @@ export function ArticlesPage() {
           {articles.map((article) => {
             const IconComponent = article.icon;
             return (
-              <article
+              <button
                 key={article.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group"
+                type="button"
+                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group text-left w-full"
                 onClick={() => setSelectedArticle(article.id)}
               >
                 <div className={`h-2 bg-gradient-to-r ${article.color}`} />
@@ -317,7 +318,7 @@ export function ArticlesPage() {
                     Leer Artículo Completo
                   </Button>
                 </div>
-              </article>
+              </button>
             );
           })}
         </div>
@@ -328,7 +329,7 @@ export function ArticlesPage() {
             Transforma tu Conocimiento en Acción
           </h2>
           <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
-            Estos artículos son solo el comienzo. Con Finance Manager, puedes
+            Estos artículos son solo el comienzo. Con Finanz, puedes
             aplicar todo lo que aprendes de forma inmediata.
           </p>
           <Link to="/register">

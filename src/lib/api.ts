@@ -1,43 +1,29 @@
 /**
- * API Client
- * Handles all HTTP requests to the backend
+ * API Service - Centralizes all HTTP requests to the backend
+ * Base URL configured via environment variable
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
-
-// ============================================================================
-// Types & Interfaces
-// ============================================================================
+import { API_BASE_URL } from "./env";
 
 export interface ApiError {
   message: string;
-  status?: number;
-  statusCode?: number;
-  errors?: Record<string, string[]>;
+  statusCode: number;
 }
 
-// Auth Types
 export interface SignupRequest {
   nickname: string;
   email: string;
   password: string;
-  confirmPassword?: string;
+  confirmPassword: string;
 }
 
 export interface SignupResponse {
   message: string;
-  user?: {
+  user: {
     id: number;
-    nickname: string;
     email: string;
-  };
-  account?: {
-    id: number;
-    name: string;
-  };
-  category?: {
-    id: number;
-    name: string;
+    nickname: string;
+    createdAt: string;
   };
 }
 
@@ -47,11 +33,12 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
+  message: string;
   user: {
     id: number;
     email: string;
     nickname: string;
+    createdAt: string;
   };
 }
 
@@ -64,363 +51,608 @@ export interface ForgotPasswordResponse {
 }
 
 export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export interface ResetPasswordResponse {
   message: string;
 }
 
-export interface ProfileResponse {
-  user: {
-    id: number;
-    email: string;
-    nickname: string;
-    createdAt: string;
+/**
+ * Generic API request handler with error handling
+ */
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const config: RequestInit = {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    credentials: "include", // Important: Send cookies (AccessToken, RefreshToken, deviceId)
   };
+
+  try {
+    const response = await fetch(url, config);
+
+    // Handle non-JSON responses
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const error = new Error("Error del servidor. Intenta nuevamente.") as Error & ApiError;
+      (error as ApiError).statusCode = response.status;
+      throw error;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const error = new Error(data.message || "Error en la solicitud") as Error & ApiError;
+      (error as ApiError).statusCode = response.status;
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    // Network errors or fetch failures
+    if (error instanceof TypeError) {
+      const apiError = new Error(
+        "No se pudo conectar al servidor. Verifica tu conexión a internet."
+      ) as Error & ApiError;
+      (apiError as ApiError).statusCode = 0;
+      throw apiError;
+    }
+    throw error;
+  }
 }
 
-// Category Types
+/**
+ * Auth API endpoints
+ */
+export const authApi = {
+  /**
+   * POST /api/auth/signup
+   * Register a new user
+   */
+  signup: async (data: SignupRequest): Promise<SignupResponse> => {
+    return apiRequest<SignupResponse>("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * POST /api/auth/login
+   * Authenticate user and receive session cookies
+   */
+  login: async (data: LoginRequest): Promise<LoginResponse> => {
+    return apiRequest<LoginResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * POST /api/auth/logout
+   * Revoke current device session
+   */
+  logout: async (): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>("/api/auth/logout", {
+      method: "POST",
+    });
+  },
+
+  /**
+   * POST /api/auth/recover
+   * Send password recovery email
+   */
+  forgotPassword: async (
+    data: ForgotPasswordRequest
+  ): Promise<ForgotPasswordResponse> => {
+    return apiRequest<ForgotPasswordResponse>("/api/auth/recover", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * POST /api/auth/reset/:token
+   * Reset password using token from email
+   */
+  resetPassword: async (
+    token: string,
+    data: ResetPasswordRequest
+  ): Promise<ResetPasswordResponse> => {
+    return apiRequest<ResetPasswordResponse>(`/api/auth/reset/${token}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * GET /api/auth/profile
+   * Get authenticated user profile
+   */
+  getProfile: async (): Promise<{ user: SignupResponse["user"] }> => {
+    return apiRequest<{ user: SignupResponse["user"] }>("/api/auth/profile", {
+      method: "GET",
+    });
+  },
+
+  /**
+   * PUT /api/auth/profile
+   * Update authenticated user profile (nickname and/or email)
+   */
+  updateProfile: async (data: {
+    nickname?: string;
+    email?: string;
+  }): Promise<{ message: string; user: SignupResponse["user"] }> => {
+    return apiRequest<{ message: string; user: SignupResponse["user"] }>(
+      "/api/auth/profile",
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * POST /api/auth/change-password
+   * Change user password (requires current password)
+   */
+  changePassword: async (data: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>("/api/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * DELETE /api/auth/account
+   * Delete user account (requires password confirmation)
+   */
+  deleteAccount: async (data: {
+    password: string;
+  }): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>("/api/auth/account", {
+      method: "DELETE",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * POST /api/auth/refresh
+   * Refresh access token using refresh token from cookies
+   */
+  refreshToken: async (): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>("/api/auth/refresh", {
+      method: "POST",
+    });
+  },
+};
+
+/**
+ * Category interfaces
+ */
 export interface Category {
   id: number;
-  name: string;
   tipo: string;
-  userId: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CategoryResponse {
-  category: Category;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateCategoryRequest {
-  name: string;
   tipo: string;
 }
 
 export interface UpdateCategoryRequest {
-  name?: string;
   tipo?: string;
 }
 
-// Account Types
+/**
+ * Category API endpoints
+ */
+export const categoryApi = {
+  /**
+   * POST /api/category
+   * Create a new category
+   */
+  create: async (
+    data: CreateCategoryRequest
+  ): Promise<{ message: string; category: Category }> => {
+    return apiRequest<{ message: string; category: Category }>(
+      "/api/category",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * GET /api/category
+   * Get all categories
+   */
+  getAll: async (): Promise<Category[]> => {
+    return apiRequest<Category[]>("/api/category", {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/category/:id
+   * Get category by ID
+   */
+  getById: async (id: number): Promise<Category> => {
+    return apiRequest<Category>(`/api/category/${id}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * PUT /api/category/:id
+   * Update category
+   */
+  update: async (
+    id: number,
+    data: UpdateCategoryRequest
+  ): Promise<{ message: string; category: Category }> => {
+    return apiRequest<{ message: string; category: Category }>(
+      `/api/category/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * DELETE /api/category/:id
+   * Delete category
+   */
+  delete: async (id: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/category/${id}`, {
+      method: "DELETE",
+    });
+  },
+};
+
+/**
+ * Account interfaces
+ */
 export interface Account {
   id: number;
-  name: string;
-  type: string;
-  balance: number;
+  name: string | null;
   money: number;
-  categoryId: number;
   userId: number;
-  category?: Category;
+  categoryId: number;
   createdAt: string;
-  updatedAt: string;
-}
-
-export interface AccountResponse {
-  account: Account;
+  category?: Category;
 }
 
 export interface CreateAccountRequest {
   name: string;
-  type?: string;
-  balance?: number;
   money: number;
   categoryId: number;
-  userId?: number;
+  userId: number;
 }
 
 export interface UpdateAccountRequest {
   name?: string;
-  type?: string;
-  balance?: number;
   money?: number;
   categoryId?: number;
 }
 
-// Tag Types
+/**
+ * Account API endpoints
+ */
+export const accountApi = {
+  /**
+   * POST /api/account
+   * Create a new account
+   */
+  create: async (
+    data: CreateAccountRequest
+  ): Promise<{ message: string; account: Account }> => {
+    return apiRequest<{ message: string; account: Account }>("/api/account", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * GET /api/account/:userId
+   * Get all accounts for a specific user
+   */
+  getAll: async (userId: number): Promise<Account[]> => {
+    return apiRequest<Account[]>(`/api/account/${userId}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/account/:id
+   * Get account by ID
+   */
+  getById: async (id: number): Promise<Account> => {
+    return apiRequest<Account>(`/api/account/${id}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * PUT /api/account/:id
+   * Update account
+   */
+  update: async (
+    id: number,
+    data: UpdateAccountRequest
+  ): Promise<{ message: string; account: Account }> => {
+    return apiRequest<{ message: string; account: Account }>(
+      `/api/account/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * DELETE /api/account/:id
+   * Delete account
+   */
+  delete: async (id: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/account/${id}`, {
+      method: "DELETE",
+    });
+  },
+};
+
+/**
+ * Tag interfaces
+ */
 export interface Tag {
   id: number;
   name: string;
-  color: string;
-  description?: string;
+  description: string | null;
   accountId: number;
-  userId: number;
-  account?: Account;
-  transactions?: Transaction[];
-  createdAt: string;
-  updatedAt: string;
+  account?: {
+    id: number;
+    name: string | null;
+  };
+  transactions?: Array<{
+    id: number;
+  }>;
 }
 
 export interface CreateTagRequest {
   name: string;
-  color: string;
   description?: string;
-  accountId?: number;
+  accountId: number;
 }
 
 export interface UpdateTagRequest {
   name?: string;
-  color?: string;
   description?: string;
-  accountId?: number;
 }
 
-// Transaction Types
+/**
+ * Tag API endpoints
+ */
+export const tagApi = {
+  /**
+   * POST /api/tag
+   * Create a new tag
+   */
+  create: async (
+    data: CreateTagRequest
+  ): Promise<{ message: string; tag: Tag }> => {
+    return apiRequest<{ message: string; tag: Tag }>("/api/tag", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * GET /api/tag
+   * Get all tags for the authenticated user
+   */
+  getAll: async (): Promise<Tag[]> => {
+    return apiRequest<Tag[]>("/api/tag", {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/tag/account/:accountId
+   * Get all tags for a specific account
+   */
+  getByAccount: async (accountId: number): Promise<Tag[]> => {
+    return apiRequest<Tag[]>(`/api/tag/account/${accountId}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * PUT /api/tag/:id
+   * Update tag
+   */
+  update: async (
+    id: number,
+    data: UpdateTagRequest
+  ): Promise<{ message: string; tag: Tag }> => {
+    return apiRequest<{ message: string; tag: Tag }>(`/api/tag/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * DELETE /api/tag/:id
+   * Delete tag
+   */
+  delete: async (id: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/tag/${id}`, {
+      method: "DELETE",
+    });
+  },
+};
+
+/**
+ * Transaction interfaces
+ */
 export interface Transaction {
   id: number;
-  description: string;
   amount: number;
-  transactionDate: string;
   isIncome: boolean;
-  userId: number;
-  accountId: number;
-  tagId?: number;
+  transactionDate: string;
+  description: string | null;
+  tagId: number;
   tag?: Tag;
-  account?: Account;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateTransactionRequest {
-  description?: string;
   amount: number;
-  transactionDate: string;
   isIncome: boolean;
-  accountId?: number;
-  tagId?: number;
+  transactionDate: string;
+  description?: string;
+  tagId: number;
 }
 
 export interface UpdateTransactionRequest {
-  description?: string;
   amount?: number;
-  transactionDate?: string;
   isIncome?: boolean;
-  accountId?: number;
+  transactionDate?: string;
+  description?: string;
   tagId?: number;
 }
 
 export interface TransactionFilters {
-  startDate?: string;
-  endDate?: string;
-  isIncome?: boolean;
   accountId?: number;
   tagId?: number;
+  isIncome?: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
-// ============================================================================
-// HTTP Client Helper
-// ============================================================================
-
-class ApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
-  private getAuthToken(): string | null {
-    return localStorage.getItem("token");
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
-    const token = this.getAuthToken();
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (options.headers) {
-      Object.assign(headers, options.headers);
-    }
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        credentials: 'include', // ✅ Incluir cookies en las peticiones
-      });
-
-      if (!response.ok) {
-        const error: ApiError = await response.json().catch(() => ({
-          message: "Error en la solicitud",
-          status: response.status,
-        }));
-        throw error;
-      }
-
-      // Check if response has content
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        return await response.json();
-      }
-
-      return {} as T;
-    } catch (error) {
-      if ((error as ApiError).message) {
-        throw error;
-      }
-      throw {
-        message: "Error de conexión con el servidor",
-        status: 0,
-      } as ApiError;
-    }
-  }
-
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "GET" });
-  }
-
-  async post<T>(endpoint: string, data?: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  async put<T>(endpoint: string, data?: unknown): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: "PUT",
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "DELETE" });
-  }
-}
-
-const apiClient = new ApiClient(API_BASE_URL);
-
-// ============================================================================
-// Auth API
-// ============================================================================
-
-export const authApi = {
-  signup: (data: SignupRequest) =>
-    apiClient.post<SignupResponse>("/auth/signup", data),
-
-  login: (data: LoginRequest) =>
-    apiClient.post<LoginResponse>("/auth/login", data),
-
-  forgotPassword: (data: ForgotPasswordRequest) =>
-    apiClient.post<ForgotPasswordResponse>("/auth/forgot-password", data),
-
-  resetPassword: (data: ResetPasswordRequest) =>
-    apiClient.post<ResetPasswordResponse>("/auth/reset-password", data),
-
-  getProfile: () => apiClient.get<ProfileResponse>("/auth/profile"),
-
-  updateProfile: (data: { nickname?: string; email?: string }) =>
-    apiClient.put<ProfileResponse>("/auth/profile", data),
-
-  changePassword: (data: { currentPassword: string; newPassword: string }) =>
-    apiClient.post<{ message: string }>("/auth/change-password", data),
-
-  deleteAccount: (data: { password: string }) =>
-    apiClient.post<{ message: string }>("/auth/delete-account", data),
-
-  logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  },
-};
-
-// ============================================================================
-// Category API
-// ============================================================================
-
-export const categoryApi = {
-  getAll: () => apiClient.get<Category[]>("/categories"),
-
-  getById: (id: number) => apiClient.get<Category>(`/categories/${id}`),
-
-  create: (data: CreateCategoryRequest) =>
-    apiClient.post<CategoryResponse>("/categories", data),
-
-  update: (id: number, data: UpdateCategoryRequest) =>
-    apiClient.put<CategoryResponse>(`/categories/${id}`, data),
-
-  delete: (id: number) => apiClient.delete<void>(`/categories/${id}`),
-};
-
-// ============================================================================
-// Account API
-// ============================================================================
-
-export const accountApi = {
-  getAll: (userId?: number) => {
-    const endpoint = userId ? `/accounts?userId=${userId}` : "/accounts";
-    return apiClient.get<Account[]>(endpoint);
-  },
-
-  getById: (id: number) => apiClient.get<Account>(`/accounts/${id}`),
-
-  create: (data: CreateAccountRequest) =>
-    apiClient.post<AccountResponse>("/accounts", data),
-
-  update: (id: number, data: UpdateAccountRequest) =>
-    apiClient.put<AccountResponse>(`/accounts/${id}`, data),
-
-  delete: (id: number) => apiClient.delete<void>(`/accounts/${id}`),
-};
-
-// ============================================================================
-// Tag API
-// ============================================================================
-
-export const tagApi = {
-  getAll: () => apiClient.get<Tag[]>("/tags"),
-
-  getById: (id: number) => apiClient.get<Tag>(`/tags/${id}`),
-
-  create: (data: CreateTagRequest) => apiClient.post<Tag>("/tags", data),
-
-  update: (id: number, data: UpdateTagRequest) =>
-    apiClient.put<Tag>(`/tags/${id}`, data),
-
-  delete: (id: number) => apiClient.delete<void>(`/tags/${id}`),
-};
-
-// ============================================================================
-// Transaction API
-// ============================================================================
-
+/**
+ * Transaction API endpoints
+ */
 export const transactionApi = {
-  getAll: (filters?: TransactionFilters) => {
-    let endpoint = "/transactions";
-    if (filters) {
-      const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value));
-        }
-      });
-      const queryString = params.toString();
-      if (queryString) {
-        endpoint += `?${queryString}`;
+  /**
+   * POST /api/transactions
+   * Create a new transaction
+   */
+  create: async (
+    data: CreateTransactionRequest
+  ): Promise<{ message: string; transaction: Transaction }> => {
+    return apiRequest<{ message: string; transaction: Transaction }>(
+      "/api/transactions",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
       }
-    }
-    return apiClient.get<Transaction[]>(endpoint);
+    );
   },
 
-  getById: (id: number) => apiClient.get<Transaction>(`/transactions/${id}`),
+  /**
+   * GET /api/transactions
+   * Get all transactions with optional filters
+   */
+  getAll: async (filters?: TransactionFilters): Promise<Transaction[]> => {
+    const params = new URLSearchParams();
 
-  create: (data: CreateTransactionRequest) =>
-    apiClient.post<Transaction>("/transactions", data),
+    if (filters) {
+      if (filters.accountId !== undefined)
+        params.append("accountId", filters.accountId.toString());
+      if (filters.tagId !== undefined)
+        params.append("tagId", filters.tagId.toString());
+      if (filters.isIncome !== undefined)
+        params.append("isIncome", filters.isIncome.toString());
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.endDate) params.append("endDate", filters.endDate);
+    }
 
-  update: (id: number, data: UpdateTransactionRequest) =>
-    apiClient.put<Transaction>(`/transactions/${id}`, data),
+    const queryString = params.toString();
+    const url = queryString
+      ? `/api/transactions?${queryString}`
+      : "/api/transactions";
 
-  delete: (id: number) => apiClient.delete<void>(`/transactions/${id}`),
+    return apiRequest<Transaction[]>(url, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/transactions/:id
+   * Get a transaction by ID
+   */
+  getById: async (id: number): Promise<Transaction> => {
+    return apiRequest<Transaction>(`/api/transactions/${id}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/transactions/date/:date
+   * Get transactions by specific date
+   */
+  getByDate: async (date: string): Promise<Transaction[]> => {
+    return apiRequest<Transaction[]>(`/api/transactions/date/${date}`, {
+      method: "GET",
+    });
+  },
+
+  /**
+   * GET /api/transactions/type/:type/date/:date
+   * Get transactions by type (income/expense) and date
+   */
+  getByTypeAndDate: async (
+    type: "income" | "expense",
+    date: string
+  ): Promise<Transaction[]> => {
+    return apiRequest<Transaction[]>(
+      `/api/transactions/type/${type}/date/${date}`,
+      {
+        method: "GET",
+      }
+    );
+  },
+
+  /**
+   * PUT /api/transactions/:id
+   * Update transaction
+   */
+  update: async (
+    id: number,
+    data: UpdateTransactionRequest
+  ): Promise<{ message: string; transaction: Transaction }> => {
+    return apiRequest<{ message: string; transaction: Transaction }>(
+      `/api/transactions/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * DELETE /api/transactions/:id
+   * Delete transaction
+   */
+  delete: async (id: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/transactions/${id}`, {
+      method: "DELETE",
+    });
+  },
 };
+
+export { API_BASE_URL } from "./env";
