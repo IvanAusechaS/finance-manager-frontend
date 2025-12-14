@@ -1,8 +1,8 @@
 import { LegalOverlay } from "./LegalOverlay";
 
 interface PrivacyPolicyProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function PrivacyPolicy({ isOpen, onClose }: PrivacyPolicyProps) {

@@ -1,8 +1,8 @@
 import { LegalOverlay } from "./LegalOverlay";
 
 interface CookiePolicyProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function CookiePolicy({ isOpen, onClose }: CookiePolicyProps) {

@@ -3,11 +3,11 @@ import { X } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface LegalOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  lastUpdated: string;
-  children: React.ReactNode;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly title: string;
+  readonly lastUpdated: string;
+  readonly children: React.ReactNode;
 }
 
 export function LegalOverlay({

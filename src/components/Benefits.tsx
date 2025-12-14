@@ -41,8 +41,8 @@ export function Benefits() {
             </div>
 
             <div className="space-y-6">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex gap-4">
+              {benefits.map((benefit) => (
+                <div key={benefit.title} className="flex gap-4">
                   <div className="flex-shrink-0">
                     <CheckCircle2 className="w-6 h-6 text-green-600" />
                   </div>
