@@ -175,8 +175,6 @@ export function LoginPage() {
     }
   };
 
-  console.log("🔐 [LoginPage] Componente montado");
-
   return (
     <>
       <Navbar />

@@ -50,19 +50,16 @@ export function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🔐 [ForgotPassword] Iniciando proceso de recuperación");
 
     setTouched(true);
     const validationError = validateField(email);
     setError(validationError);
 
     if (validationError) {
-      console.log("❌ [ForgotPassword] Error de validación:", validationError);
       return;
     }
 
     setIsLoading(true);
-    console.log("📧 [ForgotPassword] Enviando correo a:", email);
 
     try {
       // Simulación de envío de correo (reemplazar con API real)

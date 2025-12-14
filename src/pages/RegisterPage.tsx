@@ -43,8 +43,6 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log("📝 [RegisterPage] Componente montado");
-
   const [formData, setFormData] = useState({
     nickname: "",
     email: "",

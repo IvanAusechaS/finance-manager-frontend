@@ -93,7 +93,6 @@ export function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🔐 [ResetPassword] Iniciando restablecimiento de contraseña");
 
     setTouched({
       password: true,
@@ -113,7 +112,6 @@ export function ResetPasswordPage() {
     }
 
     if (!token) {
-      console.log("❌ [ResetPassword] Token no encontrado");
       toast.error("Token inválido", {
         description: "El enlace de recuperación no es válido",
       });
@@ -121,13 +119,11 @@ export function ResetPasswordPage() {
     }
 
     setIsLoading(true);
-    console.log("🔄 [ResetPassword] Actualizando contraseña con token:", token);
 
     try {
       // Simulación de actualización de contraseña (reemplazar con API real)
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("✅ [ResetPassword] Contraseña actualizada exitosamente");
       toast.success("Contraseña actualizada", {
         description: "Tu contraseña ha sido restablecida exitosamente",
         icon: <CheckCircle2 />,

@@ -11,14 +11,11 @@ export function NotFoundPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-    console.log("🔍 [NotFoundPage] Verificando autenticación");
     const checkAuth = async () => {
       try {
         await authApi.getProfile();
-        console.log("✅ [NotFoundPage] Usuario autenticado");
         setIsAuthenticated(true);
       } catch {
-        console.log("❌ [NotFoundPage] Usuario no autenticado");
         setIsAuthenticated(false);
       }
     };
@@ -26,10 +23,6 @@ export function NotFoundPage() {
   }, []);
 
   const handleMainAction = () => {
-    console.log(
-      "🔄 [NotFoundPage] Redirigiendo a:",
-      isAuthenticated ? "/dashboard" : "/login"
-    );
     navigate(isAuthenticated ? "/dashboard" : "/login");
   };
 
@@ -51,7 +44,6 @@ export function NotFoundPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
               onClick={() => {
-                console.log("⬅️ [NotFoundPage] Regresando a página anterior");
                 navigate(-1);
               }}
               variant="outline"

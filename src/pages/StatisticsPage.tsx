@@ -46,7 +46,6 @@ interface MonthlyTrend {
 }
 
 export function StatisticsPage() {
-  console.log("📈 [StatisticsPage] Componente montado");
   const [selectedAccount, setSelectedAccount] = useState<string>("all");
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
