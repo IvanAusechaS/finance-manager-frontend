@@ -107,7 +107,6 @@ export function ResetPasswordPage() {
     setErrors(newErrors);
 
     if (Object.values(newErrors).some((error) => error !== "")) {
-      console.log("❌ [ResetPassword] Errores de validación:", newErrors);
       return;
     }
 

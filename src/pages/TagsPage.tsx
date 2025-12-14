@@ -529,7 +529,6 @@ export function TagsPage() {
           {/* Floating Action Button - Mejorado para mobile */}
           <Button
             onClick={() => {
-              console.log("➕ [TagsPage] Abriendo diálogo de creación");
               setFormData({ name: "", description: "", accountId: "" });
               setErrors({ name: "", accountId: "" });
               setEditingTag(null);

@@ -65,7 +65,6 @@ export function ForgotPasswordPage() {
       // Simulación de envío de correo (reemplazar con API real)
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("✅ [ForgotPassword] Correo enviado exitosamente");
       toast.success("Correo enviado", {
         description:
           "Revisa tu bandeja de entrada para restablecer tu contraseña",

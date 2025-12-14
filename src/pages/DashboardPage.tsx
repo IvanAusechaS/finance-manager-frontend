@@ -34,7 +34,6 @@ import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 
 export function DashboardPage() {
-  console.log("📊 [DashboardPage] Componente montado");
   const { goToHome } = useRedirect();
 
   const [loading, setLoading] = useState(true);
