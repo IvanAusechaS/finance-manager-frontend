@@ -1,11 +1,12 @@
 /**
  * Environment configuration module
  * Provides safe access to Vite environment variables
+ * Note: In Jest tests, this module is mocked in setupTests.ts
  */
 
 export const getEnv = (key: string, defaultValue: string = ""): string => {
-  // In Vite runtime, import.meta.env is available
-  // In Jest tests, this file will be mocked
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - import.meta is available in Vite but not in Jest (file is mocked in tests)
   return import.meta.env[key] || defaultValue;
 };
 

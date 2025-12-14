@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { BarChart3, PieChart, TrendingUp, Calendar, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { BarChart3, PieChart, TrendingUp, Calendar } from "lucide-react";
 import {
   transactionApi,
   accountApi,
@@ -30,54 +30,29 @@ import {
   subMonths,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 
-/**
- * Interface representing statistics for a spending category
- * @interface CategoryStats
- */
 interface CategoryStats {
-  /** Category/tag name */
   name: string;
-  /** Total amount spent in this category */
   amount: number;
-  /** Percentage of total expenses */
   percentage: number;
-  /** Color code for visualization */
   color: string;
 }
 
-/**
- * Interface representing monthly financial trends
- * @interface MonthlyTrend
- */
 interface MonthlyTrend {
-  /** Month abbreviation (e.g., "Ene", "Feb") */
   month: string;
-  /** Total income for the month */
   income: number;
-  /** Total expenses for the month */
   expenses: number;
 }
 
-/**
- * Statistics page component for financial analysis
- * Displays monthly trends, category breakdowns, and summary metrics
- * @component
- */
 export function StatisticsPage() {
-  console.log("📈 [StatisticsPage] Component mounted");
+  console.log("📈 [StatisticsPage] Componente montado");
   const [selectedAccount, setSelectedAccount] = useState<string>("all");
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categoryStats, setCategoryStats] = useState<CategoryStats[]>([]);
   const [monthlyTrends, setMonthlyTrends] = useState<MonthlyTrend[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [comparisonData, setComparisonData] = useState<{
-    incomeChange: number;
-    expenseChange: number;
-    transactionChange: number;
-  }>({ incomeChange: 0, expenseChange: 0, transactionChange: 0 });
 
   const CHART_COLORS = [
     "#3b82f6", // blue
@@ -94,13 +69,7 @@ export function StatisticsPage() {
     loadData();
   }, [selectedAccount]);
 
-  /**
-   * Load all necessary data for statistics calculation
-   * Fetches user profile, accounts, and transactions
-   * @async
-   */
   const loadData = async () => {
-    console.log("📊 [StatisticsPage] Loading data for account:", selectedAccount);
     try {
       setIsLoading(true);
 
@@ -111,7 +80,6 @@ export function StatisticsPage() {
       // Load accounts
       const accountsData = await accountApi.getAll(userId);
       setAccounts(accountsData);
-      console.log("✅ [StatisticsPage] Loaded accounts:", accountsData.length);
 
       // Load transactions
       const filters: { accountId?: number } = {};
@@ -121,27 +89,19 @@ export function StatisticsPage() {
 
       const transactionsData = await transactionApi.getAll(filters);
       setTransactions(transactionsData);
-      console.log("✅ [StatisticsPage] Loaded transactions:", transactionsData.length);
 
       // Calculate statistics
       calculateCategoryStats(transactionsData);
       calculateMonthlyTrends(transactionsData);
-      calculateComparisons(transactionsData);
-      console.log("✅ [StatisticsPage] Statistics calculated successfully");
     } catch (error) {
-      console.error("❌ [StatisticsPage] Error loading data:", error);
+      console.error("Error loading data:", error);
       toast.error("Error al cargar los datos");
     } finally {
       setIsLoading(false);
     }
   };
 
-  /**
-   * Calculate spending statistics grouped by category/tag
-   * @param {Transaction[]} transactions - Array of transactions to analyze
-   */
   const calculateCategoryStats = (transactions: Transaction[]) => {
-    console.log("📊 [StatisticsPage] Calculating category stats");
     // Group expenses by tag
     const expensesByTag: { [key: string]: number } = {};
     let totalExpenses = 0;
@@ -166,15 +126,9 @@ export function StatisticsPage() {
       .slice(0, 8); // Top 8 categories
 
     setCategoryStats(stats);
-    console.log("✅ [StatisticsPage] Category stats calculated:", stats.length, "categories");
   };
 
-  /**
-   * Calculate monthly income and expense trends for the last 6 months
-   * @param {Transaction[]} transactions - Array of transactions to analyze
-   */
   const calculateMonthlyTrends = (transactions: Transaction[]) => {
-    console.log("📊 [StatisticsPage] Calculating monthly trends");
     const now = new Date();
     const sixMonthsAgo = subMonths(now, 5);
     const months = eachMonthOfInterval({ start: sixMonthsAgo, end: now });
@@ -204,64 +158,6 @@ export function StatisticsPage() {
     });
 
     setMonthlyTrends(trends);
-    console.log("✅ [StatisticsPage] Monthly trends calculated:", trends.length, "months");
-  };
-
-  /**
-   * Calculate comparison metrics between current and previous month
-   * @param {Transaction[]} transactions - Array of transactions to analyze
-   */
-  const calculateComparisons = (transactions: Transaction[]) => {
-    console.log("📊 [StatisticsPage] Calculating comparison metrics");
-    const now = new Date();
-    const currentMonthStart = startOfMonth(now);
-    const previousMonthStart = startOfMonth(subMonths(now, 1));
-    const previousMonthEnd = endOfMonth(subMonths(now, 1));
-
-    // Current month transactions
-    const currentMonthTransactions = transactions.filter((t) => {
-      const date = parseISO(t.transactionDate);
-      return date >= currentMonthStart;
-    });
-
-    // Previous month transactions
-    const previousMonthTransactions = transactions.filter((t) => {
-      const date = parseISO(t.transactionDate);
-      return date >= previousMonthStart && date <= previousMonthEnd;
-    });
-
-    // Calculate totals
-    const currentIncome = currentMonthTransactions
-      .filter((t) => t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const previousIncome = previousMonthTransactions
-      .filter((t) => t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const currentExpenses = currentMonthTransactions
-      .filter((t) => !t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const previousExpenses = previousMonthTransactions
-      .filter((t) => !t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    // Calculate percentage changes
-    const incomeChange = previousIncome > 0 
-      ? ((currentIncome - previousIncome) / previousIncome) * 100 
-      : 0;
-    
-    const expenseChange = previousExpenses > 0 
-      ? ((currentExpenses - previousExpenses) / previousExpenses) * 100 
-      : 0;
-    
-    const transactionChange = previousMonthTransactions.length > 0
-      ? ((currentMonthTransactions.length - previousMonthTransactions.length) / previousMonthTransactions.length) * 100
-      : 0;
-
-    setComparisonData({ incomeChange, expenseChange, transactionChange });
-    console.log("✅ [StatisticsPage] Comparisons calculated:", { incomeChange, expenseChange, transactionChange });
   };
 
   const maxValue = Math.max(
@@ -324,12 +220,7 @@ export function StatisticsPage() {
                         Ingresos vs Gastos - Últimos 6 meses
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-6 h-6 text-blue-500" />
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                        Comparativa histórica
-                      </span>
-                    </div>
+                    <TrendingUp className="w-6 h-6 text-blue-500" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -395,15 +286,10 @@ export function StatisticsPage() {
                         Gastos por Categoría
                       </CardTitle>
                       <p className="text-sm text-slate-600 mt-1">
-                        Distribución de tus gastos - Top 8 categorías
+                        Distribución de tus gastos
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <PieChart className="w-6 h-6 text-blue-500" />
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
-                        Análisis por etiquetas
-                      </span>
-                    </div>
+                    <PieChart className="w-6 h-6 text-blue-500" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -486,7 +372,7 @@ export function StatisticsPage() {
               </Card>
 
               {/* Summary Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
@@ -500,27 +386,9 @@ export function StatisticsPage() {
                     <p className="text-3xl font-bold text-slate-900">
                       {transactions.length}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <p className="text-sm text-slate-500">
-                        Registradas en el sistema
-                      </p>
-                      {comparisonData.transactionChange !== 0 && (
-                        <span
-                          className={`text-xs font-semibold flex items-center gap-1 ${
-                            comparisonData.transactionChange > 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {comparisonData.transactionChange > 0 ? (
-                            <ArrowUpRight className="w-3 h-3" />
-                          ) : (
-                            <ArrowDownRight className="w-3 h-3" />
-                          )}
-                          {Math.abs(comparisonData.transactionChange).toFixed(1)}%
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Registradas en el sistema
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -545,27 +413,9 @@ export function StatisticsPage() {
                           ).toFixed(2)
                         : "0.00"}
                     </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <p className="text-sm text-slate-500">
-                        Ingresos promedio
-                      </p>
-                      {comparisonData.incomeChange !== 0 && (
-                        <span
-                          className={`text-xs font-semibold flex items-center gap-1 ${
-                            comparisonData.incomeChange > 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {comparisonData.incomeChange > 0 ? (
-                            <ArrowUpRight className="w-3 h-3" />
-                          ) : (
-                            <ArrowDownRight className="w-3 h-3" />
-                          )}
-                          {Math.abs(comparisonData.incomeChange).toFixed(1)}%
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Ingresos promedio
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -585,47 +435,6 @@ export function StatisticsPage() {
                     <p className="text-sm text-slate-500 mt-1">
                       Con gastos registrados
                     </p>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-medium text-slate-600">
-                        Cambio en Gastos
-                      </CardTitle>
-                      <TrendingDown className="w-5 h-5 text-amber-500" />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p
-                      className={`text-3xl font-bold ${
-                        comparisonData.expenseChange > 0
-                          ? "text-red-600"
-                          : comparisonData.expenseChange < 0
-                          ? "text-green-600"
-                          : "text-slate-900"
-                      }`}
-                    >
-                      {comparisonData.expenseChange > 0 ? "+" : ""}
-                      {comparisonData.expenseChange.toFixed(1)}%
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <p className="text-sm text-slate-500">
-                        vs. mes anterior
-                      </p>
-                      {comparisonData.expenseChange !== 0 && (
-                        <span
-                          className={`text-xs font-semibold flex items-center gap-1 ${
-                            comparisonData.expenseChange < 0
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {comparisonData.expenseChange < 0 ? "Mejora" : "Aumento"}
-                        </span>
-                      )}
-                    </div>
                   </CardContent>
                 </Card>
               </div>

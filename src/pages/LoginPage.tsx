@@ -21,7 +21,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Footer } from "../components/Footer";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { validateEmail, validateRequired } from "../lib/validations";
 import { authApi } from "../lib/api";
 import type { ApiError } from "../lib/api";
@@ -150,7 +150,7 @@ export function LoginPage() {
         });
         setErrors({
           email: "Verifica tus credenciales",
-          password: "Verifica tus credenciales",
+          password: "",
         });
       } else if (apiError.statusCode === 423) {
         toast.error("Cuenta bloqueada", {

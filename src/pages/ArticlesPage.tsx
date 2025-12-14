@@ -152,9 +152,9 @@ export function ArticlesPage() {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
 
   const article =
-    selectedArticle !== null
-      ? articles.find((a) => a.id === selectedArticle)
-      : null;
+    selectedArticle === null
+      ? null
+      : articles.find((a) => a.id === selectedArticle);
 
   if (article) {
     const IconComponent = article.icon;
@@ -206,8 +206,8 @@ export function ArticlesPage() {
             </p>
 
             <div className="space-y-8">
-              {article.content.map((section, index) => (
-                <div key={index} className="space-y-3">
+              {article.content.map((section) => (
+                <div key={`section-${article.id}-${section.subtitle}`} className="space-y-3">
                   <h2 className="text-2xl font-bold text-slate-900">
                     {section.subtitle}
                   </h2>
@@ -275,9 +275,10 @@ export function ArticlesPage() {
           {articles.map((article) => {
             const IconComponent = article.icon;
             return (
-              <article
+              <button
                 key={article.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group"
+                type="button"
+                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group text-left w-full"
                 onClick={() => setSelectedArticle(article.id)}
               >
                 <div className={`h-2 bg-gradient-to-r ${article.color}`} />
@@ -317,7 +318,7 @@ export function ArticlesPage() {
                     Leer Artículo Completo
                   </Button>
                 </div>
-              </article>
+              </button>
             );
           })}
         </div>

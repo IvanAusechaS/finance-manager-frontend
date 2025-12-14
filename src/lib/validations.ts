@@ -38,7 +38,7 @@ export function getPasswordErrors(password: string): string[] {
   if (!/[a-z]/.test(password)) {
     errors.push("Al menos una minúscula");
   }
-  if (!/[0-9]/.test(password)) {
+  if (!/\d/.test(password)) {
     errors.push("Al menos un número");
   }
   if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
@@ -54,7 +54,9 @@ export function getPasswordErrors(password: string): string[] {
  * @returns true si el correo es válido
  */
 export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Regex seguro sin riesgo de ReDoS - limitado a 254 caracteres
+  if (email.length > 254) return false;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailRegex.test(email);
 }
 
@@ -64,8 +66,8 @@ export function validateEmail(email: string): boolean {
  * @returns true si la edad es válida (≥ 13 años)
  */
 export function validateAge(age: string | number): boolean {
-  const ageNum = typeof age === "string" ? parseInt(age, 10) : age;
-  return !isNaN(ageNum) && ageNum >= 13 && ageNum <= 120;
+  const ageNum = typeof age === "string" ? Number.parseInt(age, 10) : age;
+  return !Number.isNaN(ageNum) && ageNum >= 13 && ageNum <= 120;
 }
 
 /**

@@ -171,7 +171,7 @@ export function DashboardPage() {
       setCategoryData(categoryDataArray);
 
       // Get recent transactions (last 5)
-      const recentTxs = transactionsData
+      const recentTxs = [...transactionsData]
         .sort(
           (a, b) =>
             new Date(b.transactionDate).getTime() -
@@ -285,18 +285,19 @@ export function DashboardPage() {
                     <div className="text-slate-900 mb-1">{stat.value}</div>
                     {stat.change && (
                       <div className="flex items-center gap-3 text-sm">
-                        {stat.trend === "up" ? (
+                        {stat.trend === "up" && (
                           <ArrowUpRight className="w-4 h-4 text-green-600" />
-                        ) : stat.trend === "down" ? (
+                        )}
+                        {stat.trend === "down" && (
                           <ArrowDownRight className="w-4 h-4 text-red-600" />
-                        ) : null}
+                        )}
                         <span
                           className={
                             stat.trend === "up"
                               ? "text-green-600"
                               : stat.trend === "down"
-                              ? "text-red-600"
-                              : "text-slate-600"
+                                ? "text-red-600"
+                                : "text-slate-600"
                           }
                         >
                           {stat.change}
@@ -377,8 +378,8 @@ export function DashboardPage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      {categoryData.map((entry) => (
+                        <Cell key={`cell-${entry.name}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />

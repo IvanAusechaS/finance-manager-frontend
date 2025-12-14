@@ -79,7 +79,6 @@ import { Badge } from "../components/ui/badge";
  * @returns {JSX.Element} The transactions management page
  */
 export function TransactionsPage() {
-  console.log("💰 [TransactionsPage] Componente montado");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
@@ -166,8 +165,8 @@ export function TransactionsPage() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [isDialogOpen, formData]);
 
   const handleCancelWithConfirmation = () => {
@@ -178,7 +177,7 @@ export function TransactionsPage() {
 
     if (hasChanges && !editingTransaction) {
       if (
-        window.confirm(
+        globalThis.confirm(
           "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
         )
       ) {
@@ -192,13 +191,11 @@ export function TransactionsPage() {
   };
 
   const loadData = async () => {
-    console.log("💰 [TransactionsPage] Iniciando carga de datos");
     try {
       setLoading(true);
 
       // Load profile first to get userId
       const profileData = await authApi.getProfile();
-      console.log("💰 [TransactionsPage] Perfil cargado:", profileData.user);
 
       // Load other data in parallel
       const [transactionsData, tagsData, accountsData] = await Promise.all([
@@ -206,21 +203,6 @@ export function TransactionsPage() {
         tagApi.getAll(),
         accountApi.getAll(profileData.user.id),
       ]);
-
-      console.log(
-        "💰 [TransactionsPage] Tags cargadas:",
-        tagsData.length,
-        tagsData
-      );
-      console.log(
-        "💰 [TransactionsPage] Transacciones cargadas:",
-        transactionsData.length
-      );
-      console.log(
-        "💰 [TransactionsPage] Cuentas cargadas:",
-        accountsData.length,
-        accountsData
-      );
 
       setTransactions(transactionsData);
       setTags(tagsData);
@@ -291,14 +273,6 @@ export function TransactionsPage() {
   };
 
   const openCreateDialog = () => {
-    console.log("💰 [TransactionsPage] Abriendo diálogo de creación");
-    console.log("💰 [TransactionsPage] Tags disponibles:", tags.length, tags);
-    console.log(
-      "💰 [TransactionsPage] Cuentas disponibles:",
-      accounts.length,
-      accounts
-    );
-
     // Si no hay tags, mostrar error y no abrir el diálogo
     if (tags.length === 0) {
       toast.error(
@@ -345,9 +319,9 @@ export function TransactionsPage() {
       tagId: "",
     };
 
-    const amount = parseFloat(formData.amount);
+    const amount = Number.parseFloat(formData.amount);
 
-    if (!formData.amount || isNaN(amount)) {
+    if (!formData.amount || Number.isNaN(amount)) {
       newErrors.amount = "El monto es requerido";
     } else if (amount <= 0) {
       newErrors.amount = "El monto debe ser mayor a 0";
@@ -389,12 +363,11 @@ export function TransactionsPage() {
       return;
     }
 
-    console.log("💾 [TransactionsPage] Guardando transacción:", formData);
     setSubmitting(true);
 
     try {
       const dataToSubmit = {
-        amount: parseFloat(formData.amount),
+        amount: Number.parseFloat(formData.amount),
         isIncome: formData.isIncome,
         transactionDate: formData.transactionDate.toISOString(),
         description: formData.description || undefined,
@@ -402,16 +375,13 @@ export function TransactionsPage() {
       };
 
       if (editingTransaction) {
-        console.log("✏️ [TransactionsPage] Actualizando transacción:", editingTransaction.id);
         await transactionApi.update(editingTransaction.id, dataToSubmit);
         toast.success("Transacción actualizada correctamente");
       } else {
-        console.log("➕ [TransactionsPage] Creando nueva transacción");
         await transactionApi.create(dataToSubmit);
         toast.success("Transacción creada correctamente");
       }
 
-      console.log("✅ [TransactionsPage] Transacción guardada exitosamente");
       setIsDialogOpen(false);
       loadData();
     } catch (error: unknown) {
@@ -861,7 +831,7 @@ export function TransactionsPage() {
                       </Button>
                       <Button
                         type="button"
-                        variant={!formData.isIncome ? "default" : "outline"}
+                        variant={formData.isIncome ? "outline" : "default"}
                         className="flex-1"
                         onClick={() =>
                           setFormData({ ...formData, isIncome: false })
@@ -926,7 +896,6 @@ export function TransactionsPage() {
                             })
                           }
                           disabled={(date: Date) => date > new Date()}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -968,7 +937,7 @@ export function TransactionsPage() {
                   <div className="space-y-2">
                     <Label htmlFor="description">
                       Descripción
-                      {parseFloat(formData.amount) > 1000 && (
+                      {Number.parseFloat(formData.amount) > 1000 && (
                         <span className="text-red-500"> *</span>
                       )}
                     </Label>
@@ -990,7 +959,7 @@ export function TransactionsPage() {
                         {errors.description}
                       </p>
                     )}
-                    {parseFloat(formData.amount) > 1000 && (
+                    {Number.parseFloat(formData.amount) > 1000 && (
                       <p className="text-xs text-slate-500">
                         La descripción es obligatoria para montos mayores a
                         $1,000
@@ -1009,16 +978,14 @@ export function TransactionsPage() {
                     Cancelar
                   </Button>
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? (
+                    {submitting && (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Guardando...
                       </>
-                    ) : editingTransaction ? (
-                      "Actualizar"
-                    ) : (
-                      "Crear Transacción"
                     )}
+                    {!submitting && editingTransaction && "Actualizar"}
+                    {!submitting && !editingTransaction && "Crear Transacción"}
                   </Button>
                 </DialogFooter>
               </form>

@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Mail, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { validateEmail, validateRequired } from "../lib/validations";
 import { Footer } from "../components/Footer";
 
