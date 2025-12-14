@@ -54,7 +54,9 @@ export function getPasswordErrors(password: string): string[] {
  * @returns true si el correo es válido
  */
 export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Regex seguro sin riesgo de ReDoS - limitado a 254 caracteres
+  if (email.length > 254) return false;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailRegex.test(email);
 }
 
