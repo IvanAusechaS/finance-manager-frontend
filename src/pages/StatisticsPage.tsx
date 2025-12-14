@@ -115,15 +115,23 @@ export function StatisticsPage() {
       });
 
     // Convert to array and calculate percentages
-    const stats: CategoryStats[] = Object.entries(expensesByTag)
-      .map(([name, amount], index) => ({
+    const unsortedStats: CategoryStats[] = Object.entries(expensesByTag).map(
+      ([name, amount]) => ({
         name,
         amount,
         percentage: (amount / totalExpenses) * 100,
-        color: CHART_COLORS[index % CHART_COLORS.length],
-      }))
+        color: "", // Will be assigned after sorting
+      })
+    );
+
+    // Sort by amount and assign colors based on final position
+    const stats: CategoryStats[] = unsortedStats
       .sort((a, b) => b.amount - a.amount)
-      .slice(0, 8); // Top 8 categories
+      .slice(0, 8) // Top 8 categories
+      .map((stat, index) => ({
+        ...stat,
+        color: CHART_COLORS[index % CHART_COLORS.length],
+      }));
 
     setCategoryStats(stats);
   };
@@ -237,8 +245,8 @@ export function StatisticsPage() {
                     </div>
 
                     <div className="space-y-4">
-                      {monthlyTrends.map((trend, index) => (
-                        <div key={index} className="space-y-2">
+                      {monthlyTrends.map((trend) => (
+                        <div key={trend.month} className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
                             <span className="font-medium text-slate-900 capitalize w-16">
                               {trend.month}
@@ -302,9 +310,10 @@ export function StatisticsPage() {
                       {/* Pie-like visualization */}
                       <div className="flex items-center justify-center">
                         <div className="relative w-64 h-64">
-                          {categoryStats.map((stat, index) => {
+                          {categoryStats.map((stat) => {
+                            const statIndex = categoryStats.indexOf(stat);
                             const cumulativePercentage = categoryStats
-                              .slice(0, index)
+                              .slice(0, statIndex)
                               .reduce((sum, s) => sum + s.percentage, 0);
 
                             return (
