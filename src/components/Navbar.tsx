@@ -37,6 +37,208 @@ interface UserProfile {
   nickname: string;
 }
 
+// Helper function: Get user initials from nickname
+const getInitials = (nickname: string) => {
+  return nickname
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
+};
+
+// Helper function: Render user menu dropdown
+const renderUserMenu = (
+  user: UserProfile | null,
+  isLoading: boolean,
+  isUserMenuOpen: boolean,
+  setIsUserMenuOpen: (value: boolean) => void,
+  handleLogout: () => void
+) => {
+  if (isLoading) {
+    return <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse" />;
+  }
+
+  if (!user) return null;
+
+  return (
+    <div className="user-menu-container relative">
+      <button
+        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+      >
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">
+          {getInitials(user.nickname)}
+        </div>
+        <div className="hidden md:block text-left">
+          <div className="text-sm font-medium text-slate-900 truncate max-w-[120px]">
+            {user.nickname}
+          </div>
+          <div className="text-xs text-slate-500 truncate max-w-[120px]">
+            {user.email}
+          </div>
+        </div>
+        <ChevronDown
+          className={`hidden md:block w-4 h-4 text-slate-500 transition-transform duration-200 ${
+            isUserMenuOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isUserMenuOpen && (
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 overflow-hidden z-50">
+          <div className="md:hidden px-4 py-3 border-b border-slate-100">
+            <div className="text-sm font-medium text-slate-900 truncate">
+              {user.nickname}
+            </div>
+            <div className="text-xs text-slate-500 truncate">
+              {user.email}
+            </div>
+          </div>
+          <Link
+            to="/profile"
+            onClick={() => setIsUserMenuOpen(false)}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+          >
+            <User className="w-4 h-4" />
+            <span>Mi Perfil</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Helper function: Render dashboard mobile menu
+const renderDashboardMobileMenu = (
+  isMenuOpen: boolean,
+  setIsMenuOpen: (value: boolean) => void,
+  location: ReturnType<typeof useLocation>
+) => {
+  if (!isMenuOpen) return null;
+
+  return (
+    <>
+      <div
+        className="lg:hidden fixed inset-0 top-16 bg-black/20 z-40"
+        onClick={() => setIsMenuOpen(false)}
+      />
+      <div className="lg:hidden fixed top-16 right-4 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 overflow-hidden z-50 max-h-[calc(100vh-5rem)] overflow-y-auto">
+        {dashboardMenuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsMenuOpen(false)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                isActive
+                  ? "bg-blue-50 text-blue-700 font-medium"
+                  : "text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+// Helper function: Render authentication buttons
+const renderAuthButtons = (
+  isAuthenticated: boolean,
+  isLoading: boolean,
+  handleLogout: () => void,
+  isMobile = false
+) => {
+  if (isLoading) return null;
+
+  const buttonClasses = isMobile ? "w-full justify-start" : "";
+
+  if (isAuthenticated) {
+    return (
+      <>
+        <Link to="/dashboard" onClick={isMobile ? undefined : undefined}>
+          <Button variant="ghost" size="sm" className={buttonClasses}>
+            <User className="w-4 h-4 mr-2" />
+            Mi Cuenta
+          </Button>
+        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={buttonClasses}
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Cerrar Sesión
+        </Button>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Link to="/login">
+        <Button variant="ghost" size="sm" className={buttonClasses}>
+          Iniciar Sesión
+        </Button>
+      </Link>
+      <Link to="/register">
+        <Button size="sm" className={isMobile ? "w-full" : ""}>
+          Registrarse
+        </Button>
+      </Link>
+    </>
+  );
+};
+
+// Helper function: Render landing page mobile menu
+const renderLandingMobileMenu = (
+  isMenuOpen: boolean,
+  isAuthenticated: boolean,
+  isLoading: boolean,
+  setIsMenuOpen: (value: boolean) => void,
+  scrollToSection: (sectionId: string) => void,
+  handleLogout: () => void
+) => {
+  if (!isMenuOpen) return null;
+
+  return (
+    <div className="min-[480px]:hidden border-t border-slate-200 py-4 space-y-2">
+      <Link
+        to="/articles"
+        className="block px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        Artículos
+      </Link>
+      <button
+        onClick={() => scrollToSection("how-it-works")}
+        className="w-full text-left px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+      >
+        Cómo funciona
+      </button>
+
+      <div className="pt-4 border-t border-slate-200 space-y-2">
+        {renderAuthButtons(isAuthenticated, isLoading, handleLogout, true)}
+      </div>
+    </div>
+  );
+};
+
 /**
  * Navbar component - Doble función:
  * 1. Landing page: barra simple con login/register
@@ -129,19 +331,6 @@ export function Navbar() {
     }
   };
 
-  const getInitials = (nickname: string) => {
-    return nickname
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
-  const handleMenuItemClick = () => {
-    setIsMenuOpen(false);
-  };
-
   // DASHBOARD NAVBAR
   if (isDashboardRoute && isAuthenticated) {
     return (
@@ -184,98 +373,18 @@ export function Navbar() {
             </button>
 
             {/* User Profile */}
-            {isLoading ? (
-              <div className="w-8 h-8 bg-slate-200 rounded-full animate-pulse" />
-            ) : user ? (
-              <div className="user-menu-container relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-md">
-                    {getInitials(user.nickname)}
-                  </div>
-                  <div className="hidden md:block text-left">
-                    <div className="text-sm font-medium text-slate-900 truncate max-w-[120px]">
-                      {user.nickname}
-                    </div>
-                    <div className="text-xs text-slate-500 truncate max-w-[120px]">
-                      {user.email}
-                    </div>
-                  </div>
-                  <ChevronDown
-                    className={`hidden md:block w-4 h-4 text-slate-500 transition-transform duration-200 ${
-                      isUserMenuOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {/* User Dropdown */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 overflow-hidden z-50">
-                    <div className="md:hidden px-4 py-3 border-b border-slate-100">
-                      <div className="text-sm font-medium text-slate-900 truncate">
-                        {user.nickname}
-                      </div>
-                      <div className="text-xs text-slate-500 truncate">
-                        {user.email}
-                      </div>
-                    </div>
-                    <Link
-                      to="/profile"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                    >
-                      <User className="w-4 h-4" />
-                      <span>Mi Perfil</span>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Cerrar sesión</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : null}
+            {renderUserMenu(
+              user,
+              isLoading,
+              isUserMenuOpen,
+              setIsUserMenuOpen,
+              handleLogout
+            )}
           </div>
         </div>
 
         {/* Mobile Menu - Aparece desde la derecha como el user menu */}
-        {isMenuOpen && (
-          <>
-            <div
-              className="lg:hidden fixed inset-0 top-16 bg-black/20 z-40"
-              onClick={() => {
-                setIsMenuOpen(false);
-              }}
-            />
-            <div className="lg:hidden fixed top-16 right-4 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 overflow-hidden z-50 max-h-[calc(100vh-5rem)] overflow-y-auto">
-              {dashboardMenuItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={handleMenuItemClick}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
-                      isActive
-                        ? "bg-blue-50 text-blue-700 font-medium"
-                        : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          </>
-        )}
+        {renderDashboardMobileMenu(isMenuOpen, setIsMenuOpen, location)}
       </header>
     );
   }
@@ -309,35 +418,7 @@ export function Navbar() {
 
             {/* Auth Buttons - Hide on mobile (<480px), show from 480px+ */}
             <div className="hidden min-[480px]:flex items-center gap-3">
-              {!isLoading && (
-                <>
-                  {isAuthenticated ? (
-                    <>
-                      <Link to="/dashboard">
-                        <Button variant="ghost" size="sm">
-                          <User className="w-4 h-4 mr-2" />
-                          Mi Cuenta
-                        </Button>
-                      </Link>
-                      <Button variant="ghost" size="sm" onClick={handleLogout}>
-                        <LogOut className="w-4 h-4 mr-2" />
-                        Cerrar Sesión
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/login">
-                        <Button variant="ghost" size="sm">
-                          Iniciar Sesión
-                        </Button>
-                      </Link>
-                      <Link to="/register">
-                        <Button size="sm">Registrarse</Button>
-                      </Link>
-                    </>
-                  )}
-                </>
-              )}
+              {renderAuthButtons(isAuthenticated, isLoading, handleLogout)}
             </div>
 
             {/* Mobile Menu Button - Solo mostrar si hay algo que mostrar en el menú */}
@@ -357,75 +438,13 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="min-[480px]:hidden border-t border-slate-200 py-4 space-y-2">
-              <Link
-                to="/articles"
-                className="block px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Artículos
-              </Link>
-              <button
-                onClick={() => scrollToSection("how-it-works")}
-                className="w-full text-left px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
-              >
-                Cómo funciona
-              </button>
-
-              <div className="pt-4 border-t border-slate-200 space-y-2">
-                {!isLoading && (
-                  <>
-                    {isAuthenticated ? (
-                      <>
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start"
-                          >
-                            <User className="w-4 h-4 mr-2" />
-                            Mi Cuenta
-                          </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full justify-start"
-                          onClick={handleLogout}
-                        >
-                          <LogOut className="w-4 h-4 mr-2" />
-                          Cerrar Sesión
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start"
-                          >
-                            Iniciar Sesión
-                          </Button>
-                        </Link>
-                        <Link
-                          to="/register"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Button size="sm" className="w-full">
-                            Registrarse
-                          </Button>
-                        </Link>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
+          {renderLandingMobileMenu(
+            isMenuOpen,
+            isAuthenticated,
+            isLoading,
+            setIsMenuOpen,
+            scrollToSection,
+            handleLogout
           )}
         </div>
       </nav>
