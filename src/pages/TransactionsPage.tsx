@@ -166,8 +166,8 @@ export function TransactionsPage() {
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [isDialogOpen, formData]);
 
   const handleCancelWithConfirmation = () => {
@@ -178,7 +178,7 @@ export function TransactionsPage() {
 
     if (hasChanges && !editingTransaction) {
       if (
-        window.confirm(
+        globalThis.confirm(
           "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
         )
       ) {
@@ -345,9 +345,9 @@ export function TransactionsPage() {
       tagId: "",
     };
 
-    const amount = parseFloat(formData.amount);
+    const amount = Number.parseFloat(formData.amount);
 
-    if (!formData.amount || isNaN(amount)) {
+    if (!formData.amount || Number.isNaN(amount)) {
       newErrors.amount = "El monto es requerido";
     } else if (amount <= 0) {
       newErrors.amount = "El monto debe ser mayor a 0";
@@ -394,7 +394,7 @@ export function TransactionsPage() {
 
     try {
       const dataToSubmit = {
-        amount: parseFloat(formData.amount),
+        amount: Number.parseFloat(formData.amount),
         isIncome: formData.isIncome,
         transactionDate: formData.transactionDate.toISOString(),
         description: formData.description || undefined,
@@ -861,7 +861,7 @@ export function TransactionsPage() {
                       </Button>
                       <Button
                         type="button"
-                        variant={!formData.isIncome ? "default" : "outline"}
+                        variant={formData.isIncome ? "outline" : "default"}
                         className="flex-1"
                         onClick={() =>
                           setFormData({ ...formData, isIncome: false })
@@ -926,7 +926,6 @@ export function TransactionsPage() {
                             })
                           }
                           disabled={(date: Date) => date > new Date()}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -968,7 +967,7 @@ export function TransactionsPage() {
                   <div className="space-y-2">
                     <Label htmlFor="description">
                       Descripción
-                      {parseFloat(formData.amount) > 1000 && (
+                      {Number.parseFloat(formData.amount) > 1000 && (
                         <span className="text-red-500"> *</span>
                       )}
                     </Label>
@@ -990,7 +989,7 @@ export function TransactionsPage() {
                         {errors.description}
                       </p>
                     )}
-                    {parseFloat(formData.amount) > 1000 && (
+                    {Number.parseFloat(formData.amount) > 1000 && (
                       <p className="text-xs text-slate-500">
                         La descripción es obligatoria para montos mayores a
                         $1,000
@@ -1009,16 +1008,14 @@ export function TransactionsPage() {
                     Cancelar
                   </Button>
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? (
+                    {submitting && (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Guardando...
                       </>
-                    ) : editingTransaction ? (
-                      "Actualizar"
-                    ) : (
-                      "Crear Transacción"
                     )}
+                    {!submitting && editingTransaction && "Actualizar"}
+                    {!submitting && !editingTransaction && "Crear Transacción"}
                   </Button>
                 </DialogFooter>
               </form>

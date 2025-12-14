@@ -275,18 +275,11 @@ export function ArticlesPage() {
           {articles.map((article) => {
             const IconComponent = article.icon;
             return (
-              <article
+              <button
                 key={article.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group"
+                type="button"
+                className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md hover:border-slate-300 transition-all cursor-pointer group text-left w-full"
                 onClick={() => setSelectedArticle(article.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedArticle(article.id);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
               >
                 <div className={`h-2 bg-gradient-to-r ${article.color}`} />
 
@@ -325,7 +318,7 @@ export function ArticlesPage() {
                     Leer Artículo Completo
                   </Button>
                 </div>
-              </article>
+              </button>
             );
           })}
         </div>
