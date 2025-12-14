@@ -79,7 +79,6 @@ import { Badge } from "../components/ui/badge";
  * @returns {JSX.Element} The transactions management page
  */
 export function TransactionsPage() {
-  console.log("💰 [TransactionsPage] Componente montado");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
@@ -192,13 +191,11 @@ export function TransactionsPage() {
   };
 
   const loadData = async () => {
-    console.log("💰 [TransactionsPage] Iniciando carga de datos");
     try {
       setLoading(true);
 
       // Load profile first to get userId
       const profileData = await authApi.getProfile();
-      console.log("💰 [TransactionsPage] Perfil cargado:", profileData.user);
 
       // Load other data in parallel
       const [transactionsData, tagsData, accountsData] = await Promise.all([
@@ -206,21 +203,6 @@ export function TransactionsPage() {
         tagApi.getAll(),
         accountApi.getAll(profileData.user.id),
       ]);
-
-      console.log(
-        "💰 [TransactionsPage] Tags cargadas:",
-        tagsData.length,
-        tagsData
-      );
-      console.log(
-        "💰 [TransactionsPage] Transacciones cargadas:",
-        transactionsData.length
-      );
-      console.log(
-        "💰 [TransactionsPage] Cuentas cargadas:",
-        accountsData.length,
-        accountsData
-      );
 
       setTransactions(transactionsData);
       setTags(tagsData);
@@ -291,14 +273,6 @@ export function TransactionsPage() {
   };
 
   const openCreateDialog = () => {
-    console.log("💰 [TransactionsPage] Abriendo diálogo de creación");
-    console.log("💰 [TransactionsPage] Tags disponibles:", tags.length, tags);
-    console.log(
-      "💰 [TransactionsPage] Cuentas disponibles:",
-      accounts.length,
-      accounts
-    );
-
     // Si no hay tags, mostrar error y no abrir el diálogo
     if (tags.length === 0) {
       toast.error(
@@ -389,7 +363,6 @@ export function TransactionsPage() {
       return;
     }
 
-    console.log("💾 [TransactionsPage] Guardando transacción:", formData);
     setSubmitting(true);
 
     try {
@@ -402,16 +375,13 @@ export function TransactionsPage() {
       };
 
       if (editingTransaction) {
-        console.log("✏️ [TransactionsPage] Actualizando transacción:", editingTransaction.id);
         await transactionApi.update(editingTransaction.id, dataToSubmit);
         toast.success("Transacción actualizada correctamente");
       } else {
-        console.log("➕ [TransactionsPage] Creando nueva transacción");
         await transactionApi.create(dataToSubmit);
         toast.success("Transacción creada correctamente");
       }
 
-      console.log("✅ [TransactionsPage] Transacción guardada exitosamente");
       setIsDialogOpen(false);
       loadData();
     } catch (error: unknown) {
