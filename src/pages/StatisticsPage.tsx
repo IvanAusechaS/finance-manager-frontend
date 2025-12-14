@@ -84,7 +84,7 @@ export function StatisticsPage() {
       // Load transactions
       const filters: { accountId?: number } = {};
       if (selectedAccount !== "all") {
-        filters.accountId = parseInt(selectedAccount);
+        filters.accountId = Number.parseInt(selectedAccount);
       }
 
       const transactionsData = await transactionApi.getAll(filters);
