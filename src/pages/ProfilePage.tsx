@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../lib/api";
-import { toast } from "sonner";
+import { toast } from "../utils/toast";
 import { Button } from "../components/ui/button";
 import { Navbar } from "../components/Navbar";
 import {

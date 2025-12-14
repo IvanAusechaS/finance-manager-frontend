@@ -21,11 +21,9 @@ export const toast = {
 
     // Si ya existe un toast con este mensaje, no mostrar otro
     if (activeToasts.has(id)) {
-      console.log("🔕 [Toast] Toast duplicado bloqueado:", message);
       return;
     }
 
-    console.log("✅ [Toast] Mostrando success:", message);
     activeToasts.add(id);
 
     sonnerToast.success(message, {
@@ -48,11 +46,9 @@ export const toast = {
 
     // Si ya existe un toast con este mensaje, no mostrar otro
     if (activeToasts.has(id)) {
-      console.log("🔕 [Toast] Toast duplicado bloqueado:", message);
       return;
     }
 
-    console.log("❌ [Toast] Mostrando error:", message);
     activeToasts.add(id);
 
     sonnerToast.error(message, {
@@ -74,11 +70,9 @@ export const toast = {
     const id = getToastId(message, "info");
 
     if (activeToasts.has(id)) {
-      console.log("🔕 [Toast] Toast duplicado bloqueado:", message);
       return;
     }
 
-    console.log("ℹ️ [Toast] Mostrando info:", message);
     activeToasts.add(id);
 
     sonnerToast.info(message, {
@@ -100,11 +94,9 @@ export const toast = {
     const id = getToastId(message, "warning");
 
     if (activeToasts.has(id)) {
-      console.log("🔕 [Toast] Toast duplicado bloqueado:", message);
       return;
     }
 
-    console.log("⚠️ [Toast] Mostrando warning:", message);
     activeToasts.add(id);
 
     sonnerToast.warning(message, {
