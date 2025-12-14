@@ -124,8 +124,8 @@ export function StatisticsPage() {
     );
 
     // Sort by amount and assign colors based on final position
-    const stats: CategoryStats[] = unsortedStats
-      .sort((a, b) => b.amount - a.amount)
+    const sortedStats = [...unsortedStats].sort((a, b) => b.amount - a.amount);
+    const stats: CategoryStats[] = sortedStats
       .slice(0, 8) // Top 8 categories
       .map((stat, index) => ({
         ...stat,

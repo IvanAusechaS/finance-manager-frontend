@@ -170,7 +170,7 @@ const renderAuthButtons = (
   if (isAuthenticated) {
     return (
       <>
-        <Link to="/dashboard" onClick={isMobile ? undefined : undefined}>
+        <Link to="/dashboard">
           <Button variant="ghost" size="sm" className={buttonClasses}>
             <User className="w-4 h-4 mr-2" />
             Mi Cuenta
