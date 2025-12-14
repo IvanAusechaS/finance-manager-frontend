@@ -36,8 +36,8 @@ interface UserProfile {
 }
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {

@@ -5,11 +5,14 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "ESNext",
+    "target": "ES2022",
     "verbatimModuleSyntax": false,
-    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "allowImportingTsExtensions": false,
+    "types": ["jest", "@testing-library/jest-dom", "node", "vite/client"],
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "noEmit": false
   },
   "include": [
     "src/**/*",

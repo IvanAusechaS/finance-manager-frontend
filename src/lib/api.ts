@@ -83,30 +83,28 @@ async function apiRequest<T>(
     // Handle non-JSON responses
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      throw {
-        message: "Error del servidor. Intenta nuevamente.",
-        statusCode: response.status,
-      };
+      const error = new Error("Error del servidor. Intenta nuevamente.") as Error & ApiError;
+      (error as ApiError).statusCode = response.status;
+      throw error;
     }
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw {
-        message: data.message || "Error en la solicitud",
-        statusCode: response.status,
-      };
+      const error = new Error(data.message || "Error en la solicitud") as Error & ApiError;
+      (error as ApiError).statusCode = response.status;
+      throw error;
     }
 
     return data;
   } catch (error) {
     // Network errors or fetch failures
     if (error instanceof TypeError) {
-      throw {
-        message:
-          "No se pudo conectar al servidor. Verifica tu conexión a internet.",
-        statusCode: 0,
-      };
+      const apiError = new Error(
+        "No se pudo conectar al servidor. Verifica tu conexión a internet."
+      ) as Error & ApiError;
+      (apiError as ApiError).statusCode = 0;
+      throw apiError;
     }
     throw error;
   }
@@ -657,4 +655,4 @@ export const transactionApi = {
   },
 };
 
-export { API_BASE_URL };
+export { API_BASE_URL } from "./env";

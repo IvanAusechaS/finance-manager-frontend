@@ -498,16 +498,14 @@ export function TagsPage() {
                     Cancelar
                   </Button>
                   <Button type="submit" disabled={submitting}>
-                    {submitting ? (
+                    {submitting && (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Guardando...
                       </>
-                    ) : editingTag ? (
-                      "Actualizar"
-                    ) : (
-                      "Crear Etiqueta"
                     )}
+                    {!submitting && editingTag && "Actualizar"}
+                    {!submitting && !editingTag && "Crear Etiqueta"}
                   </Button>
                 </DialogFooter>
               </form>
