@@ -11,8 +11,8 @@ const config: Config = {
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/src/__mocks__/fileMock.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^.*/lib/env$": "<rootDir>/src/__mocks__/env.ts",
-    "\\.\/lib\/env$": "<rootDir>/src/__mocks__/env.ts",
-    "^.*\\/env$": "<rootDir>/src/__mocks__/env.ts",
+    "\\./lib/env$": "<rootDir>/src/__mocks__/env.ts",
+    "^.*/env$": "<rootDir>/src/__mocks__/env.ts",
   },
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",

@@ -5,7 +5,8 @@
  */
 
 export const getEnv = (key: string, defaultValue: string = ""): string => {
-  // @ts-ignore - import.meta is not available in Jest, but this file is mocked in tests
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - import.meta is available in Vite but not in Jest (file is mocked in tests)
   return import.meta.env[key] || defaultValue;
 };
 
