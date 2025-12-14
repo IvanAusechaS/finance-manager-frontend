@@ -4,9 +4,15 @@
  */
 
 export const getEnv = (key: string, defaultValue: string = ""): string => {
-  // In Vite runtime, import.meta.env is available
-  // In Jest tests, this file will be mocked
-  return import.meta.env[key] || defaultValue;
+  // Use eval to avoid TypeScript compilation issues with import.meta in Jest
+  try {
+    // eslint-disable-next-line no-eval
+    const importMeta = eval("import.meta");
+    return importMeta?.env?.[key] || defaultValue;
+  } catch {
+    // Fallback for test environment or when import.meta is not available
+    return defaultValue;
+  }
 };
 
 export const API_BASE_URL = getEnv(
