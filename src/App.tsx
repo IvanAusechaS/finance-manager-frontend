@@ -18,8 +18,6 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
 export default function App() {
-  console.log("🚀 [App] Aplicación iniciada");
-
   return (
     <BrowserRouter>
       <Routes>

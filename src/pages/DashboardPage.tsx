@@ -34,7 +34,6 @@ import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 
 export function DashboardPage() {
-  console.log("📊 [DashboardPage] Componente montado");
   const { goToHome } = useRedirect();
 
   const [loading, setLoading] = useState(true);
@@ -160,10 +159,10 @@ export function DashboardPage() {
         });
 
       const categoryDataArray = Array.from(categoryMap.entries())
-        .map(([name, value], index) => ({
+        .map(([name, value]) => ({
           name,
           value,
-          color: colors[index % colors.length],
+          color: colors[Array.from(categoryMap.keys()).indexOf(name) % colors.length],
         }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 7);

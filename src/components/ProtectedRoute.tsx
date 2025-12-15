@@ -4,7 +4,7 @@ import { authApi } from "../lib/api";
 import { toast } from "sonner";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {

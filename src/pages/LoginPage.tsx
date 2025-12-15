@@ -139,7 +139,7 @@ export function LoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Forzar recarga para asegurar que las cookies estén disponibles
-      window.location.href = "/dashboard";
+      globalThis.location.href = "/dashboard";
     } catch (error) {
       // Manejo de errores del servidor
       const apiError = error as ApiError;
@@ -174,8 +174,6 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
-
-  console.log("🔐 [LoginPage] Componente montado");
 
   return (
     <>

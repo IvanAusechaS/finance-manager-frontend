@@ -39,7 +39,7 @@ export function HowItWorks() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
-            <div key={index} className="text-center space-y-4">
+            <div key={step.number} className="text-center space-y-4">
               <div className="relative inline-block">
                 <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto">
                   <step.icon

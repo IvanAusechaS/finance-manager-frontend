@@ -8,8 +8,6 @@ export function PasswordResetSuccessPage() {
   const location = useLocation();
   const email = location.state?.email || "";
 
-  console.log("✅ [PasswordResetSuccess] Página cargada con email:", email);
-
   return (
     <>
       <section className="min-h-screen px-4 py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 flex items-center justify-center">

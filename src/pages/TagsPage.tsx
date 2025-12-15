@@ -60,7 +60,6 @@ const TAG_COLORS = [
 ];
 
 export function TagsPage() {
-  console.log("🏷️ [TagsPage] Componente montado");
   const [tags, setTags] = useState<Tag[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,15 +90,10 @@ export function TagsPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      console.log("📥 [TagsPage] Cargando datos: tags y cuentas");
 
       // Primero obtener el perfil del usuario
       const { authApi } = await import("../lib/api");
       const profileData = await authApi.getProfile();
-      console.log(
-        "✅ [TagsPage] Perfil obtenido, userId:",
-        profileData.user.id
-      );
 
       // Luego cargar tags y cuentas del usuario
       const [tagsData, accountsData] = await Promise.all([
@@ -107,12 +101,6 @@ export function TagsPage() {
         accountApi.getAll(profileData.user.id),
       ]);
 
-      console.log(
-        "✅ [TagsPage] Datos cargados - Tags:",
-        tagsData.length,
-        "Cuentas:",
-        accountsData.length
-      );
       setTags(tagsData);
       setAccounts(accountsData);
     } catch (error) {
@@ -541,7 +529,6 @@ export function TagsPage() {
           {/* Floating Action Button - Mejorado para mobile */}
           <Button
             onClick={() => {
-              console.log("➕ [TagsPage] Abriendo diálogo de creación");
               setFormData({ name: "", description: "", accountId: "" });
               setErrors({ name: "", accountId: "" });
               setEditingTag(null);
