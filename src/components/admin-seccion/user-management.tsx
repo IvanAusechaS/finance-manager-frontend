@@ -35,7 +35,7 @@ const mapApiToUser = (item: UserListItem, isDeleted: boolean = false): User => {
         name: item.nickname,
         email: item.email,
         status: status, // Asumimos 'active' si no es admin y no está marcado como eliminado localmente
-        role: item.role.name.replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        role: item.role.name.replaceAll('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         joinDate: item.createdAt.split('T')[0],
         transactions: Math.floor(Math.random() * 100),
         balance: `$${(Math.random() * 30000).toFixed(2)}`,
