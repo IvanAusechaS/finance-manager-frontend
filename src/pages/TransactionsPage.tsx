@@ -433,17 +433,22 @@ export function TransactionsPage() {
   };
 
   // Calcular estadísticas
-  const stats = {
-    total: filteredTransactions.length,
-    income: filteredTransactions
+  const calculateStats = (transactions: Transaction[]) => {
+    const income = transactions
       .filter((t) => t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0),
-    expense: filteredTransactions
+      .reduce((sum, t) => sum + t.amount, 0);
+    const expense = transactions
       .filter((t) => !t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0),
-    balance: 0,
+      .reduce((sum, t) => sum + t.amount, 0);
+    return {
+      total: transactions.length,
+      income,
+      expense,
+      balance: income - expense,
+    };
   };
-  stats.balance = stats.income - stats.expense;
+
+  const stats = calculateStats(filteredTransactions);
 
   const hasActiveFilters =
     filterAccount !== "all" ||
