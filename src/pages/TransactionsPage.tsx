@@ -282,20 +282,20 @@ export function TransactionsPage() {
     }
   };
 
+  const loadUserData = async () => {
+    const profileData = await authApi.getProfile();
+    const [transactionsData, tagsData, accountsData] = await Promise.all([
+      transactionApi.getAll(),
+      tagApi.getAll(),
+      accountApi.getAll(profileData.user.id),
+    ]);
+    return { transactionsData, tagsData, accountsData };
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
-
-      // Load profile first to get userId
-      const profileData = await authApi.getProfile();
-
-      // Load other data in parallel
-      const [transactionsData, tagsData, accountsData] = await Promise.all([
-        transactionApi.getAll(),
-        tagApi.getAll(),
-        accountApi.getAll(profileData.user.id),
-      ]);
-
+      const { transactionsData, tagsData, accountsData } = await loadUserData();
       setTransactions(transactionsData);
       setTags(tagsData);
       setAccounts(accountsData);
