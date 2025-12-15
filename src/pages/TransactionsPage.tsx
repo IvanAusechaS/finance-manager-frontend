@@ -243,6 +243,11 @@ export function TransactionsPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
+    const handleSubmitShortcut = () => {
+      const form = document.querySelector("form") as HTMLFormElement;
+      form?.requestSubmit();
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle shortcuts when dialog is open
       if (!isDialogOpen) return;
@@ -250,10 +255,8 @@ export function TransactionsPage() {
       // Ctrl+Enter to submit
       if (e.ctrlKey && e.key === "Enter") {
         e.preventDefault();
-        const form = document.querySelector("form") as HTMLFormElement;
-        if (form) {
-          form.requestSubmit();
-        }
+        handleSubmitShortcut();
+        return;
       }
 
       // ESC to cancel (with confirmation if there are changes)
@@ -268,16 +271,12 @@ export function TransactionsPage() {
   }, [isDialogOpen, formData]);
 
   const handleCancelWithConfirmation = () => {
-    if (hasFormChanges(formData, editingTransaction)) {
-      if (
-        globalThis.confirm(
-          "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
-        )
-      ) {
-        setIsDialogOpen(false);
-        resetForm();
-      }
-    } else {
+    const hasChanges = hasFormChanges(formData, editingTransaction);
+    const shouldCancel = !hasChanges || globalThis.confirm(
+      "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
+    );
+
+    if (shouldCancel) {
       setIsDialogOpen(false);
       resetForm();
     }
@@ -316,17 +315,11 @@ export function TransactionsPage() {
   };
 
   const handleFilterChange = () => {
-    const newFilters: TransactionFilters = {};
-
-    if (filterAccount !== "all") {
-      newFilters.accountId = Number(filterAccount);
-    }
-    if (filterTag !== "all") {
-      newFilters.tagId = Number(filterTag);
-    }
-    if (filterType !== "all") {
-      newFilters.isIncome = filterType === "income";
-    }
+    const newFilters: TransactionFilters = {
+      ...(filterAccount !== "all" && { accountId: Number(filterAccount) }),
+      ...(filterTag !== "all" && { tagId: Number(filterTag) }),
+      ...(filterType !== "all" && { isIncome: filterType === "income" }),
+    };
 
     setFilters(newFilters);
     setIsFilterOpen(false);
@@ -349,15 +342,7 @@ export function TransactionsPage() {
       return;
     }
 
-    setEditingTransaction(null);
-    setFormData({
-      amount: "",
-      isIncome: true,
-      transactionDate: new Date(),
-      description: "",
-      tagId: "",
-    });
-    setErrors({ amount: "", transactionDate: "", description: "", tagId: "" });
+    resetForm();
     setIsDialogOpen(true);
   };
 
