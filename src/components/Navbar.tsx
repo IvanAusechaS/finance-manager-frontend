@@ -126,9 +126,11 @@ const renderDashboardMobileMenu = (
 
   return (
     <>
-      <div
+      <button
         className="lg:hidden fixed inset-0 top-16 bg-black/20 z-40"
         onClick={() => setIsMenuOpen(false)}
+        aria-label="Cerrar menú"
+        tabIndex={0}
       />
       <div className="lg:hidden fixed top-16 right-4 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 overflow-hidden z-50 max-h-[calc(100vh-5rem)] overflow-y-auto">
         {dashboardMenuItems.map((item) => {

@@ -104,25 +104,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Backdrop - Solo visible cuando el sidebar está abierto */}
       {isOpen && (
-        <div
+        <button
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => {
             onClose();
           }}
-          aria-hidden="true"
+          aria-label="Cerrar menú"
+          tabIndex={0}
         />
       )}
 
       {/* Sidebar Container */}
-      <div
+      <dialog
+        open={isOpen}
         className={`
           fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50
           flex flex-col
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          border-0 p-0 max-w-none max-h-none m-0
         `}
-        role="dialog"
-        aria-modal="true"
         aria-label="Menú de navegación"
       >
         {/* Header con logo y botón cerrar */}
@@ -219,7 +220,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span className="text-sm">Cerrar sesión</span>
           </Button>
         </div>
-      </div>
+      </dialog>
     </>
   );
 }
