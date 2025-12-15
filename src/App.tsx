@@ -16,6 +16,8 @@ import { TransactionsPage } from "./pages/TransactionsPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { AdminPage } from "./pages/Admin-seccion";
+import { AdminLoginPage } from "./pages/AdminLoginPage";
 
 export default function App() {
   console.log("🚀 [App] Aplicación iniciada");
@@ -24,6 +26,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Rutas públicas */}
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminPage />} />
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
