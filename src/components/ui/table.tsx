@@ -7,10 +7,9 @@ import { cn } from "./utils";
 /**
  * Table component wrapper
  * ⚠️ IMPORTANT: Always use with TableHeader and TableHead components to ensure accessibility
- * Tables MUST have header rows with <th> elements
+ * Tables MUST have header rows with <th> elements when rendering actual data tables.
  * 
- * This is a generic wrapper component. Actual table instances MUST include TableHeader.
- * SonarCloud warning suppressed here as this is a reusable component.
+ * This is a generic wrapper component. The role will be overridden by consumers.
  */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -20,9 +19,9 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
-        role="table"
+        role="presentation"
         className={cn("w-full caption-bottom text-sm", className)}
-        {...props} // NOSONAR - Generic table component, consumers must add TableHeader
+        {...props}
       />
     </div>
   );
