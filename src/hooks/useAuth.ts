@@ -84,7 +84,7 @@ export function useAuthAdmin() {
           const userRole = response.user.role?.name;
           if (userRole === 'admin' || userRole === 'super_admin') {
             const { id, nickname, email } = response.user;
-            setAdminUser({ id, nickname, email, role: userRole as "admin" | "super_admin" });
+            setAdminUser({ id, nickname, email, role: userRole });
             setIsAuthenticatedAdmin(true);
           } else {
             throw new Error('User is not an admin');

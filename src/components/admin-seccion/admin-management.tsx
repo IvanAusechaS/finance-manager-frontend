@@ -123,7 +123,7 @@ export function AdminManagement() {
             return;
         }
 
-        if (window.confirm(`¿Estás seguro de que deseas eliminar al administrador ${adminToDelete?.email}?`)) {
+        if (globalThis.confirm(`¿Estás seguro de que deseas eliminar al administrador ${adminToDelete?.email}?`)) {
             try {
                 // Llama al endpoint DELETE. El backend se encarga de aplicar deletedAt: new Date()
                 await adminApi.deleteAdmin(id); 
@@ -147,9 +147,14 @@ export function AdminManagement() {
     );
     
     // Si hay término de búsqueda, incluimos al Super Admin si coincide, si no, lo dejamos al inicio
-    const displayAdmins = searchTerm.length > 0 
-        ? (superAdmin && (superAdmin.email.toLowerCase().includes(searchTerm.toLowerCase()) || superAdmin.nickname.toLowerCase().includes(searchTerm.toLowerCase())) ? [superAdmin, ...filteredAdmins] : filteredAdmins)
-        : admins;
+    let displayAdmins = admins;
+    if (searchTerm.length > 0) {
+        const superAdminMatches = superAdmin && (
+            superAdmin.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            superAdmin.nickname.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        displayAdmins = superAdminMatches ? [superAdmin, ...filteredAdmins] : filteredAdmins;
+    }
 
 
     if (isLoading) {
@@ -247,8 +252,8 @@ export function AdminManagement() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-wrap gap-1">
-                                            {admin.permissions.slice(0, 2).map((perm, idx) => (
-                                                <span key={idx} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded">
+                                            {admin.permissions.slice(0, 2).map((perm) => (
+                                                <span key={perm} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded">
                                                     {perm}
                                                 </span>
                                             ))}
@@ -307,8 +312,9 @@ export function AdminManagement() {
                             <p className="text-sm text-slate-600">El nuevo administrador deberá cambiar su contraseña al iniciar sesión por primera vez.</p>
                             
                             <div>
-                                <label className="block text-slate-700 mb-2 font-medium">Email</label>
+                                <label htmlFor="admin-email" className="block text-slate-700 mb-2 font-medium">Email</label>
                                 <input
+                                    id="admin-email"
                                     type="email"
                                     value={newAdmin.email}
                                     onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
@@ -318,8 +324,9 @@ export function AdminManagement() {
                             </div>
                             
                             <div>
-                                <label className="block text-slate-700 mb-2 font-medium">Contraseña Inicial</label>
+                                <label htmlFor="admin-password" className="block text-slate-700 mb-2 font-medium">Contraseña Inicial</label>
                                 <input
+                                    id="admin-password"
                                     type="password"
                                     value={newAdmin.password}
                                     onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}

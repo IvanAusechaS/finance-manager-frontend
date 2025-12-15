@@ -35,7 +35,7 @@ const mapApiToUser = (item: UserListItem, isDeleted: boolean = false): User => {
         name: item.nickname,
         email: item.email,
         status: status, // Asumimos 'active' si no es admin y no está marcado como eliminado localmente
-        role: item.role.name.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        role: item.role.name.replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase()),
         joinDate: item.createdAt.split('T')[0],
         transactions: Math.floor(Math.random() * 100),
         balance: `$${(Math.random() * 30000).toFixed(2)}`,
@@ -88,7 +88,7 @@ export function UserManagement() {
 
     // 2. Lógica de Eliminación Lógica (Suspender)
     const handleDeleteUser = useCallback(async (userId: number, email: string) => {
-        if (!window.confirm(`¿Confirmas la ELIMINACIÓN LÓGICA (Suspensión) del usuario ${email}?`)) {
+        if (!globalThis.confirm(`¿Confirmas la ELIMINACIÓN LÓGICA (Suspensión) del usuario ${email}?`)) {
             setOpenMenuId(null);
             return;
         }
@@ -118,7 +118,7 @@ export function UserManagement() {
         // En un sistema real, esta función llamaría a un PUT /api/admin/users/:id/restore 
         // que limpiaría el campo `deletedAt`.
         
-        if (!window.confirm(`¿Confirmas la RE-ACTIVACIÓN del usuario ${email}?`)) {
+        if (!globalThis.confirm(`¿Confirmas la RE-ACTIVACIÓN del usuario ${email}?`)) {
             setOpenMenuId(null);
             return;
         }

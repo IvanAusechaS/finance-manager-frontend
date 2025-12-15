@@ -6,12 +6,12 @@ import { toast } from "sonner";
 import type { UserWithRole } from "../lib/api"; // Type for user with role information
 
 interface AdminProtectedRouteProps {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }
 
-const REQUIRED_ROLES = ['admin', 'super_admin']; // Roles que pueden acceder al panel
+const REQUIRED_ROLES = new Set(['admin', 'super_admin']); // Roles que pueden acceder al panel
 
-export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
+export function AdminProtectedRoute({ children }: Readonly<AdminProtectedRouteProps>) {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
@@ -25,7 +25,7 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
         // 2. Verificar rol
         const userRole = profileResponse.user.role?.name; // Asume que el rol viene aquí
         
-        if (userRole && REQUIRED_ROLES.includes(userRole)) {
+        if (userRole && REQUIRED_ROLES.has(userRole)) {
           setHasPermission(true);
         } else {
           // Usuario autenticado, pero sin el rol correcto

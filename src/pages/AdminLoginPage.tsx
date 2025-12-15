@@ -131,7 +131,7 @@ export function AdminLoginPage() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       // 🚨 CAMBIO CLAVE 2: Redirección al Dashboard de Admin
-      window.location.href = "/admin/dashboard";
+      globalThis.location.href = "/admin/dashboard";
 
     } catch (error) {
       const apiError = error as ApiError;

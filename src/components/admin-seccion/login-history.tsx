@@ -196,12 +196,12 @@ export function LoginHistory() {
                                 <td className="px-6 py-4">
                                     <span
                                         className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                            !isRevoked 
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
+                                            isRevoked 
+                                                ? 'bg-red-100 text-red-700'
+                                                : 'bg-green-100 text-green-700'
                                         }`}
                                     >
-                                        {!isRevoked ? 'Activa' : 'Revocada'}
+                                        {isRevoked ? 'Revocada' : 'Activa'}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4">

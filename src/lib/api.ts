@@ -348,7 +348,7 @@ export const adminApi = {
     let endpoint = "/api/admin/logs/login";
     
     // Construir la cadena de consulta (query string) si existe userId
-    if (query && query.userId) {
+    if (query?.userId) {
       endpoint += `?userId=${query.userId}`;
     }
 
