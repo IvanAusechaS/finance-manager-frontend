@@ -82,9 +82,9 @@ export function AdminManagement() {
             const statsResponse = await adminApi.getOverviewStats(thirtyDaysAgo, today);
             setStats(statsResponse);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error fetching admin data:", err);
-            setError(err.message || "Error al cargar los datos de administración.");
+            setError(err instanceof Error ? err.message : "Error al cargar los datos de administración.");
         } finally {
             setIsLoading(false);
         }
@@ -110,8 +110,8 @@ export function AdminManagement() {
             setShowAddModal(false);
             setNewAdmin({ email: '', password: '', role: 'Admin' });
             await fetchAdminsAndStats();
-        } catch (err: any) {
-            alert(`Error al agregar administrador: ${err.message}`);
+        } catch (err: unknown) {
+            alert(`Error al agregar administrador: ${err instanceof Error ? err.message : 'Unknown error'}`);
         }
     };
 
@@ -130,9 +130,9 @@ export function AdminManagement() {
                 
                 // Recargar la lista para mostrar solo los admins activos restantes
                 await fetchAdminsAndStats();
-            } catch (err: any) {
+            } catch (err: unknown) {
                 // Aquí podrías mostrar el mensaje de error si el usuario ya estaba eliminado
-                alert(`Error al eliminar administrador: ${err.message}`);
+                alert(`Error al eliminar administrador: ${err instanceof Error ? err.message : 'Unknown error'}`);
             }
         }
     };

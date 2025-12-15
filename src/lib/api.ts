@@ -73,6 +73,10 @@ export interface AdminLoginResponse {
   };
 }
 
+export type UserWithRole = SignupResponse["user"] & {
+  role?: { name: string; };
+};
+
 export interface UserSessionLog {
   id: number;
   userId: number;

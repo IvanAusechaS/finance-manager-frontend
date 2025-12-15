@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { authApi} from "../lib/api";
-import type { AdminLoginResponse } from "../lib/api";
+import type { UserWithRole } from "../lib/api";
 
 /**
  * Custom hook to manage authentication state
@@ -80,17 +80,16 @@ export function useAuthAdmin() {
   const checkAdminAuth = async () => {
       setIsLoadingAdmin(true);
       try {
-          // Suponemos que existe authApi.getAdminProfile() (usando el endpoint /api/auth/admin/profile)
-          const response: AdminLoginResponse = await authApi.getAdminProfile(); 
-          
-          setAdminUser({
-              id: response.user.id,
-              nickname: response.user.nickname,
-              email: response.user.email,
-              role: response.user.role,
-          });
-          setIsAuthenticatedAdmin(true);
-      } catch (error) {
+          const response: { user: UserWithRole } = await authApi.getProfile();
+          const userRole = response.user.role?.name;
+          if (userRole === 'admin' || userRole === 'super_admin') {
+            const { id, nickname, email } = response.user;
+            setAdminUser({ id, nickname, email, role: userRole as "admin" | "super_admin" });
+            setIsAuthenticatedAdmin(true);
+          } else {
+            throw new Error('User is not an admin');
+          }
+      } catch {
           setIsAuthenticatedAdmin(false);
           setAdminUser(null);
       } finally {

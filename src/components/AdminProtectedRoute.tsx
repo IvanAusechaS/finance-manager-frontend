@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 // Asegúrate de que esta API devuelva el rol del usuario
 import { authApi } from "../lib/api"; 
 import { toast } from "sonner";
-import type { UserProfileResponse } from "../lib/api"; // Asume que tienes un tipo para la respuesta del perfil
+import type { UserWithRole } from "../lib/api"; // Type for user with role information
 
 interface AdminProtectedRouteProps {
   children: React.ReactNode;
@@ -20,12 +20,12 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
     const checkAdminAuth = async () => {
       try {
         // 1. Verificar autenticación y obtener perfil
-        const profileResponse: UserProfileResponse = await authApi.getProfile(); 
+        const profileResponse: { user: UserWithRole } = await authApi.getProfile(); 
         
         // 2. Verificar rol
         const userRole = profileResponse.user.role?.name; // Asume que el rol viene aquí
         
-        if (REQUIRED_ROLES.includes(userRole)) {
+        if (userRole && REQUIRED_ROLES.includes(userRole)) {
           setHasPermission(true);
         } else {
           // Usuario autenticado, pero sin el rol correcto
@@ -36,7 +36,7 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
             duration: 4000,
           });
         }
-      } catch (error) {
+      } catch {
         // Falló la autenticación (no logueado)
         setHasPermission(false);
         // Opcional: Mostrar error genérico de login si no viene de login-admin
