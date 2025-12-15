@@ -15,6 +15,7 @@ import { TagsPage } from "./pages/TagsPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { AdminPage } from "./pages/Admin-seccion";
 import { AdminLoginPage } from "./pages/AdminLoginPage";
@@ -25,7 +26,14 @@ export default function App() {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/admin-login" element={<AdminLoginPage />} />
-        <Route path="/admin/dashboard" element={<AdminPage />} />
+        <Route 
+          path="/admin/dashboard" 
+          element={
+            <AdminProtectedRoute>
+              <AdminPage />
+            </AdminProtectedRoute>
+          } 
+        />
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
