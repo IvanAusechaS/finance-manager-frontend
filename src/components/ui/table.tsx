@@ -18,12 +18,11 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
     >
-      {/* sonar-disable-next-line typescript:S5256 */}
       <table
         data-slot="table"
         role="table"
         className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
+        {...props} // NOSONAR - Generic table component, consumers must add TableHeader
       />
     </div>
   );
