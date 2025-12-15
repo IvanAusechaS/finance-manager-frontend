@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Calendar,
   TrendingUp,
+  MessageSquare,
   LogOut,
   Wallet,
   FolderKanban,
@@ -27,7 +28,7 @@ const dashboardMenuItems = [
   { icon: Wallet, label: "Cuentas", path: "/accounts" },
   { icon: Tag, label: "Etiquetas", path: "/tags" },
   { icon: BarChart3, label: "Estadísticas", path: "/statistics" },
-  { icon: TrendingUp, label: "Reportes", path: "/reports" },
+  { icon: MessageSquare, label: "Chat IA", path: "/chat-ai" },
   { icon: User, label: "Gestión de Cuenta", path: "/profile" },
 ];
 
@@ -264,7 +265,7 @@ export function Navbar() {
     "/accounts",
     "/tags",
     "/statistics",
-    "/reports",
+    "/chat-ai",
     "/profile",
   ].includes(location.pathname);
 

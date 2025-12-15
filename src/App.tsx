@@ -14,6 +14,7 @@ import { ArticlesPage } from "./pages/ArticlesPage";
 import { TagsPage } from "./pages/TagsPage";
 import { TransactionsPage } from "./pages/TransactionsPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
+import { ChatAIPage } from "./pages/ChatAIPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -99,6 +100,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <StatisticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat-ai"
+          element={
+            <ProtectedRoute>
+              <ChatAIPage />
             </ProtectedRoute>
           }
         />
