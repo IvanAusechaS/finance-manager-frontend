@@ -33,9 +33,11 @@ export function LegalOverlay({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
-      <div
+      <button
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        aria-label="Cerrar overlay"
+        tabIndex={0}
       />
 
       {/* Overlay Content */}

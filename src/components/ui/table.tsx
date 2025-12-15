@@ -4,6 +4,11 @@ import * as React from "react";
 
 import { cn } from "./utils";
 
+/**
+ * Table component wrapper
+ * ⚠️ IMPORTANT: Always use with TableHeader and TableHead components to ensure accessibility
+ * Tables MUST have header rows with <th> elements
+ */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
