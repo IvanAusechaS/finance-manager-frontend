@@ -12,7 +12,6 @@ import { cn } from "./utils";
  * This is a generic wrapper component. Actual table instances MUST include TableHeader.
  * SonarCloud warning suppressed here as this is a reusable component.
  */
-// eslint-disable-next-line jsx-a11y/table-has-caption
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
