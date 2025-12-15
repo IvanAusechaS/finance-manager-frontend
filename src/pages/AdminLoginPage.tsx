@@ -14,7 +14,6 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import {
-  Wallet,
   Mail,
   Lock,
   ArrowRight,
@@ -26,7 +25,7 @@ import { Footer } from "../components/Footer";
 import { toast } from "../utils/toast";
 import { validateEmail, validateRequired } from "../lib/validations";
 import { authApi } from "../lib/api";
-import type { ApiError, AdminLoginResponse } from "../lib/api"; // Importamos el nuevo tipo
+import type { ApiError } from "../lib/api";
 
 export function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);

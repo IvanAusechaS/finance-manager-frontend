@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { KeyRound, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { adminApi} from '../../lib/api'; // Ajusta la ruta
@@ -101,7 +101,7 @@ export function PasswordResetStats() {
                                 <XAxis dataKey="label" stroke="#64748b" />
                                 <YAxis stroke="#64748b" />
                                 <Tooltip
-                                    formatter={(value, name, props) => [value, props.payload.label]}
+                                    formatter={(value, _name, props) => [value, props.payload.label]}
                                     contentStyle={{ 
                                         backgroundColor: '#fff', 
                                         border: '1px solid #e2e8f0',

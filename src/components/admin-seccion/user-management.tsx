@@ -333,9 +333,9 @@ export function UserManagement() {
                                                             <button
                                                                 onClick={() => handleDeleteUser(user.id, user.email)}
                                                                 // Deshabilitar la suspensión si es un Admin (por seguridad)
-                                                                disabled={user.status === 'admin'}
+                                                                disabled={user.role === 'admin'}
                                                                 className={`w-full px-4 py-2 text-left text-sm ${
-                                                                    user.status === 'admin' ? 'text-slate-400 cursor-not-allowed' : 'text-red-700 hover:bg-red-50'
+                                                                    user.role === 'admin' ? 'text-slate-400 cursor-not-allowed' : 'text-red-700 hover:bg-red-50'
                                                                 } flex items-center gap-2`}
                                                             >
                                                                 <Ban className="w-4 h-4 text-red-600" />

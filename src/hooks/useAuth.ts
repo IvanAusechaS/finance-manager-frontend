@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { authApi} from "../lib/api";
-import type { AdminLoginResponse , ApiError} from "../lib/api";
+import type { AdminLoginResponse } from "../lib/api";
 
 /**
  * Custom hook to manage authentication state

@@ -22,14 +22,15 @@ interface Admin {
 }
 
 // Mock de Permisos disponibles (solo visuales)
-const availablePermissions = [
-    'Gestión de usuarios',
-    'Gestión de admins',
-    'Ver reportes',
-    'Ver estadísticas',
-    'Resetear contraseñas',
-    'Configuración del sistema'
-];
+// Commented out as it's not currently used in the component
+// const availablePermissions = [
+//     'Gestión de usuarios',
+//     'Gestión de admins',
+//     'Ver reportes',
+//     'Ver estadísticas',
+//     'Resetear contraseñas',
+//     'Configuración del sistema'
+// ];
 
 
 export function AdminManagement() {
