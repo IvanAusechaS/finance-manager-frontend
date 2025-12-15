@@ -187,7 +187,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* User Profile Section */}
         <div className="p-4 border-t border-slate-200 bg-slate-50">
-          {isLoading ? (
+          {isLoading && (
             <div className="flex items-center gap-3 px-4 py-3 mb-3">
               <div className="w-12 h-12 bg-slate-200 rounded-full animate-pulse" />
               <div className="flex-1 min-w-0">
@@ -195,7 +195,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
               </div>
             </div>
-          ) : user ? (
+          )}
+          {!isLoading && user && (
             <div className="flex items-center gap-3 px-4 py-3 mb-3 rounded-lg bg-white border border-slate-200">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">
                 {getInitials(user.nickname)}
@@ -209,7 +210,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
 
           <Button
             variant="ghost"
