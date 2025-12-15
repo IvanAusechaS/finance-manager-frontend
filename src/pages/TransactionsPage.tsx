@@ -373,7 +373,7 @@ export function TransactionsPage() {
     };
 
     setErrors(newErrors);
-    return Object.values(newErrors).every((error) => !error);
+    return !Object.values(newErrors).some((error) => error);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

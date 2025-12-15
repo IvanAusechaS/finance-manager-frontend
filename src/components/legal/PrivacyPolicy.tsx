@@ -280,7 +280,7 @@ export function PrivacyPolicy({ isOpen, onClose }: PrivacyPolicyProps) {
           >
             privacy@finanzasapp.com
           </a>
-          . Responderemos en un plazo de 30 días.
+          <span>. Responderemos en un plazo de 30 días.</span>
         </p>
       </section>
 

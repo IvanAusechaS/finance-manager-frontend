@@ -8,13 +8,18 @@ import { cn } from "./utils";
  * Table component wrapper
  * ⚠️ IMPORTANT: Always use with TableHeader and TableHead components to ensure accessibility
  * Tables MUST have header rows with <th> elements
+ * 
+ * This is a generic wrapper component. Actual table instances MUST include TableHeader.
+ * SonarCloud warning suppressed here as this is a reusable component.
  */
+// eslint-disable-next-line jsx-a11y/table-has-caption
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
     >
+      {/* sonar-disable-next-line typescript:S5256 */}
       <table
         data-slot="table"
         role="table"
