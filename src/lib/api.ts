@@ -60,6 +60,45 @@ export interface ResetPasswordResponse {
 }
 
 /**
+ * interfaces for the admin
+ */
+export interface AdminLoginResponse {
+  message: string;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+    createdAt: string;
+    role: "admin" | "super_admin";
+  };
+}
+
+export type UserWithRole = SignupResponse["user"] & {
+  role?: { name: string; };
+};
+
+export interface UserSessionLog {
+  id: number;
+  userId: number;
+  deviceId: string;
+  userAgent: string;
+  ip: string;
+  createdAt: string;
+  lastUsedAt: string;
+  expiresAt: string;
+  revoke: boolean;
+}
+
+export interface LoginLogsResponse {
+  logs: UserSessionLog[];
+}
+
+// Interfaz para pasar parámetros opcionales a la URL
+export interface LoginLogsQuery {
+  userId?: number; 
+}
+
+/**
  * Generic API request handler with error handling
  */
 async function apiRequest<T>(
@@ -143,6 +182,17 @@ export const authApi = {
   logout: async (): Promise<{ message: string }> => {
     return apiRequest<{ message: string }>("/api/auth/logout", {
       method: "POST",
+    });
+  },
+
+  /**
+   * POST /api/auth/admin/login
+   * Authenticate Admin/Super Admin and receive session cookies (`adminAuthToken`)
+   */
+  adminLogin: async (data: LoginRequest): Promise<AdminLoginResponse> => {
+    return apiRequest<AdminLoginResponse>("/api/auth/admin/login", {
+      method: "POST",
+      body: JSON.stringify(data),
     });
   },
 
@@ -235,6 +285,120 @@ export const authApi = {
   refreshToken: async (): Promise<{ message: string }> => {
     return apiRequest<{ message: string }>("/api/auth/refresh", {
       method: "POST",
+    });
+  },
+};
+
+/**
+ * Admin API interfaces
+ */
+// Usuarios
+export interface UserListItem {
+  id: number;
+  email: string;
+  nickname: string;
+  createdAt: string;
+  role: { name: 'user' | 'admin' | 'super_admin' };
+}
+export interface UserListResponse {
+  users: UserListItem[];
+}
+
+// Estadísticas de Reseteo
+export interface ResetStatsByUser {
+  userId: number;
+  resetCount: number;
+}
+export interface ResetStatsResponse {
+  totalResets: number;
+  byUser: ResetStatsByUser[];
+}
+
+// Estadísticas Generales
+export interface OverviewStatsResponse {
+  transactionsCount: number;
+  totalUsers: number;
+  adminCount: number;
+  from: string; // ISO Date string
+  to: string;   // ISO Date string
+}
+
+// Gestión de Administradores (Creación)
+// Reutilizamos LoginRequest para el body
+export interface AdminCreationResponse {
+  message: string;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+    createdAt: string;
+  };
+}
+/**
+ * Admin API endpoints
+ * Requieren la cookie `adminAuthToken`
+ */
+export const adminApi = {
+  /**
+   * GET /api/admin/logs/login
+   * Obtiene el historial de sesiones (logs de login)
+   * @param query - userId opcional para filtrar
+   */
+  getLoginLogs: async (query?: LoginLogsQuery): Promise<LoginLogsResponse> => {
+    let endpoint = "/api/admin/logs/login";
+    
+    // Construir la cadena de consulta (query string) si existe userId
+    if (query?.userId) {
+      endpoint += `?userId=${query.userId}`;
+    }
+
+    return apiRequest<LoginLogsResponse>(endpoint, {
+      method: "GET",
+    });
+  },
+  // 5.2.1 Obtener todos los usuarios
+  getUsers: async (): Promise<UserListResponse> => {
+    return apiRequest<UserListResponse>("/api/admin/users", {
+      method: "GET",
+    });
+  },
+
+// 5.2.2 Eliminar (lógicamente) un usuario
+  deleteUser: async (userId: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/admin/users/${userId}`, {
+      method: "DELETE",
+    });
+  },
+
+// 5.3 Estadísticas de reseteo de contraseña
+  getPasswordResetStats: async (): Promise<ResetStatsResponse> => {
+    return apiRequest<ResetStatsResponse>("/api/admin/stats/password-resets", {
+      method: "GET",
+    });
+  },
+
+// 5.4 Estadísticas generales
+  getOverviewStats: async (from: string, to: string): Promise<OverviewStatsResponse> => {
+    // Las fechas deben ser pasadas como YYYY-MM-DD
+    const endpoint = `/api/admin/stats/overview?from=${from}&to=${to}`;
+    return apiRequest<OverviewStatsResponse>(endpoint, {
+      method: "GET",
+    });
+  },
+
+// 6.1 Crear un nuevo administrador (Requiere Super Admin)
+// Reutiliza LoginRequest del authApi para el body
+  createAdmin: async (data: LoginRequest): Promise<AdminCreationResponse> => {
+    return apiRequest<AdminCreationResponse>("/api/admin/admins", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+// 6.2 Eliminar un administrador (Requiere Super Admin)
+  deleteAdmin: async (adminId: number): Promise<{ message: string }> => {
+    return apiRequest<{ message: string }>(`/api/admin/admins/${adminId}`, {
+      method: "DELETE",
     });
   },
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { authApi } from "../lib/api";
+import { authApi} from "../lib/api";
+import type { UserWithRole } from "../lib/api";
 
 /**
  * Custom hook to manage authentication state
@@ -49,5 +50,76 @@ export function useAuth() {
     user,
     logout,
     checkAuth,
+  };
+}
+
+
+
+/**
+ * Define la estructura del objeto de usuario administrador
+ */
+interface AdminUser {
+  id: number;
+  nickname: string;
+  email: string;
+  role: "admin" | "super_admin";
+}
+
+/**
+* Custom hook para gestionar el estado de autenticación del panel de administración.
+*/
+export function useAuthAdmin() {
+  const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState(false);
+  const [isLoadingAdmin, setIsLoadingAdmin] = useState(true);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+      checkAdminAuth();
+  }, []);
+
+  const checkAdminAuth = async () => {
+      setIsLoadingAdmin(true);
+      try {
+          const response: { user: UserWithRole } = await authApi.getProfile();
+          const userRole = response.user.role?.name;
+          if (userRole === 'admin' || userRole === 'super_admin') {
+            const { id, nickname, email } = response.user;
+            setAdminUser({ id, nickname, email, role: userRole });
+            setIsAuthenticatedAdmin(true);
+          } else {
+            throw new Error('User is not an admin');
+          }
+      } catch {
+          setIsAuthenticatedAdmin(false);
+          setAdminUser(null);
+      } finally {
+          setIsLoadingAdmin(false);
+      }
+  };
+  
+  /**
+   * ⭐ Cierra la sesión del administrador usando el endpoint genérico /api/auth/logout.
+   * Luego, fuerza una re-verificación para actualizar el estado.
+   */
+  const adminLogout = async () => {
+      try {
+          // Usamos el endpoint genérico de logout, el backend se encargará de la cookie de admin
+          await authApi.logout(); 
+      } catch (error) {
+          console.error("Error al cerrar sesión de administrador (API):", error);
+          // El error es manejado en el frontend forzando el estado a no autenticado
+      } finally {
+          // Forzamos la re-verificación para actualizar el estado del hook
+          await checkAdminAuth(); 
+      }
+  };
+
+  return {
+      isAuthenticatedAdmin,
+      isLoadingAdmin,
+      adminUser,
+      adminRole: adminUser?.role,
+      checkAdminAuth,
+      adminLogout, // Incluimos la función de logout para su uso en la UI
   };
 }
