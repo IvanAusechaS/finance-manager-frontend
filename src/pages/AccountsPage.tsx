@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "../components/ui/dialog";
 import {
   AlertDialog,
@@ -90,11 +91,6 @@ export function AccountsPage() {
   const resetForm = () => {
     setFormData({ name: "", money: "", categoryId: "" });
     setSelectedAccount(null);
-  };
-
-  const handleCreateClick = () => {
-    resetForm();
-    setIsCreateOpen(true);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -212,98 +208,37 @@ export function AccountsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Cuentas
-          </h1>
-          <Button onClick={handleCreateClick}>
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Cuenta
-          </Button>
-        </div>
+      <div className="flex py-12 min-h-screen bg-slate-50">
+        <main className="flex-1 overflow-auto">
+          {/* Header */}
+          <div className="bg-white border-b border-slate-200 px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                  Gestión de Cuentas
+                </h1>
+                <p className="text-slate-600">
+                  Administra tus cuentas bancarias y registra tus finanzas
+                </p>
+              </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : accounts.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                No hay cuentas registradas
-              </p>
-              <Button onClick={handleCreateClick}>
-                <Plus className="w-4 h-4 mr-2" />
-                Crear Primera Cuenta
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {accounts.map((account) => (
-              <Card
-                key={account.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="text-lg">{account.name}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditClick(account)}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteClick(account)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Saldo:
-                      </span>
-                      <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                        ${account.money.toFixed(2)}
-                      </p>
-                    </div>
-                    {account.category && (
-                      <div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Categoría:
-                        </span>
-                        <p className="font-medium">{account.category.tipo}</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Create Dialog */}
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nueva Cuenta</DialogTitle>
-              <DialogDescription>
-                Crea una nueva cuenta para gestionar tus finanzas
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate}>
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Nueva Cuenta
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Nueva Cuenta</DialogTitle>
+                    <DialogDescription>
+                      Crea una nueva cuenta para gestionar tus finanzas
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreate}>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="create-name">Nombre *</Label>
@@ -372,9 +307,82 @@ export function AccountsPage() {
             </form>
           </DialogContent>
         </Dialog>
+            </div>
+          </div>
 
-        {/* Edit Dialog */}
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          {/* Content */}
+          <div className="p-8">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              </div>
+            ) : accounts.length === 0 ? (
+              <Card className="p-12 text-center bg-white">
+                <div className="text-slate-400 mb-4">
+                  <p className="text-lg font-medium">No hay cuentas registradas</p>
+                  <p className="text-sm mt-2">
+                    Comienza creando tu primera cuenta bancaria
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {accounts.map((account) => (
+                  <Card
+                    key={account.id}
+                    className="hover:shadow-lg transition-shadow bg-white"
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span className="text-lg">{account.name}</span>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditClick(account)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(account)}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm text-slate-500">
+                            Saldo:
+                          </span>
+                          <p className="text-xl font-bold text-green-600">
+                            ${account.money.toFixed(2)}
+                          </p>
+                        </div>
+                        {account.category && (
+                          <div>
+                            <span className="text-sm text-slate-500">
+                              Categoría:
+                            </span>
+                            <p className="font-medium">{account.category.tipo}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Editar Cuenta</DialogTitle>
@@ -476,8 +484,7 @@ export function AccountsPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </div>
+      </>
   );
 }
 
