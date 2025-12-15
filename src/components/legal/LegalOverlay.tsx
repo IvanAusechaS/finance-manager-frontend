@@ -3,11 +3,11 @@ import { X } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface LegalOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  lastUpdated: string;
-  children: React.ReactNode;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly title: string;
+  readonly lastUpdated: string;
+  readonly children: React.ReactNode;
 }
 
 export function LegalOverlay({
@@ -33,9 +33,11 @@ export function LegalOverlay({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
-      <div
+      <button
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        aria-label="Cerrar overlay"
+        tabIndex={0}
       />
 
       {/* Overlay Content */}

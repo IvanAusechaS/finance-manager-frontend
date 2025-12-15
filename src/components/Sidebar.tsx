@@ -104,25 +104,26 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Backdrop - Solo visible cuando el sidebar está abierto */}
       {isOpen && (
-        <div
+        <button
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => {
             onClose();
           }}
-          aria-hidden="true"
+          aria-label="Cerrar menú"
+          tabIndex={0}
         />
       )}
 
       {/* Sidebar Container */}
-      <div
+      <dialog
+        open={isOpen}
         className={`
           fixed top-0 left-0 h-full w-72 bg-white shadow-2xl z-50
           flex flex-col
           transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          border-0 p-0 max-w-none max-h-none m-0
         `}
-        role="dialog"
-        aria-modal="true"
         aria-label="Menú de navegación"
       >
         {/* Header con logo y botón cerrar */}
@@ -186,7 +187,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* User Profile Section */}
         <div className="p-4 border-t border-slate-200 bg-slate-50">
-          {isLoading ? (
+          {isLoading && (
             <div className="flex items-center gap-3 px-4 py-3 mb-3">
               <div className="w-12 h-12 bg-slate-200 rounded-full animate-pulse" />
               <div className="flex-1 min-w-0">
@@ -194,7 +195,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="h-3 bg-slate-200 rounded animate-pulse w-2/3" />
               </div>
             </div>
-          ) : user ? (
+          )}
+          {!isLoading && user && (
             <div className="flex items-center gap-3 px-4 py-3 mb-3 rounded-lg bg-white border border-slate-200">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md">
                 {getInitials(user.nickname)}
@@ -208,7 +210,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
 
           <Button
             variant="ghost"
@@ -219,7 +221,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <span className="text-sm">Cerrar sesión</span>
           </Button>
         </div>
-      </div>
+      </dialog>
     </>
   );
 }

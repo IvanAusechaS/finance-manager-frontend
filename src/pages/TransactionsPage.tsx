@@ -60,6 +60,104 @@ import { es } from "date-fns/locale";
 import { Badge } from "../components/ui/badge";
 
 /**
+ * Validates amount field
+ */
+function validateAmount(amount: string): string {
+  const parsedAmount = Number.parseFloat(amount);
+
+  if (!amount || Number.isNaN(parsedAmount)) {
+    return "El monto es requerido";
+  }
+  if (parsedAmount <= 0) {
+    return "El monto debe ser mayor a 0";
+  }
+  if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
+    return "El monto debe tener máximo 2 decimales";
+  }
+  return "";
+}
+
+/**
+ * Validates transaction date
+ */
+function validateTransactionDate(transactionDate: Date | undefined): string {
+  if (!transactionDate) {
+    return "La fecha es requerida";
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const selectedDate = new Date(transactionDate);
+  selectedDate.setHours(0, 0, 0, 0);
+
+  if (selectedDate > today) {
+    return "La fecha no puede ser futura";
+  }
+  return "";
+}
+
+/**
+ * Validates description based on amount
+ */
+function validateDescription(amount: string, description: string): string {
+  const parsedAmount = Number.parseFloat(amount);
+  if (parsedAmount > 1000 && !description.trim()) {
+    return "La descripción es obligatoria para montos mayores a $1,000";
+  }
+  return "";
+}
+
+/**
+ * Applies filters to transactions
+ */
+function applyTransactionFilters(
+  transactions: Transaction[],
+  filters: TransactionFilters,
+  searchQuery: string
+): Transaction[] {
+  let result = [...transactions];
+
+  // Apply API filters
+  if (filters.accountId) {
+    result = result.filter((t) => t.tag?.accountId === filters.accountId);
+  }
+  if (filters.tagId) {
+    result = result.filter((t) => t.tagId === filters.tagId);
+  }
+  if (filters.isIncome !== undefined) {
+    result = result.filter((t) => t.isIncome === filters.isIncome);
+  }
+
+  // Apply search query
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    result = result.filter(
+      (t) =>
+        t.description?.toLowerCase().includes(query) ||
+        t.tag?.name.toLowerCase().includes(query) ||
+        t.amount.toString().includes(query)
+    );
+  }
+
+  return result;
+}
+
+/**
+ * Checks if form has unsaved changes
+ */
+function hasFormChanges(
+  formData: { amount: string; description: string; tagId: string },
+  editingTransaction: Transaction | null
+): boolean {
+  return (
+    (formData.amount !== "" ||
+      formData.description !== "" ||
+      formData.tagId !== "") &&
+    !editingTransaction
+  );
+}
+
+/**
  * TransactionsPage Component
  * 
  * Comprehensive transaction management interface for tracking income and expenses.
@@ -145,6 +243,11 @@ export function TransactionsPage() {
 
   // Keyboard shortcuts
   useEffect(() => {
+    const handleSubmitShortcut = () => {
+      const form = document.querySelector("form") as HTMLFormElement;
+      form?.requestSubmit();
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle shortcuts when dialog is open
       if (!isDialogOpen) return;
@@ -152,10 +255,8 @@ export function TransactionsPage() {
       // Ctrl+Enter to submit
       if (e.ctrlKey && e.key === "Enter") {
         e.preventDefault();
-        const form = document.querySelector("form") as HTMLFormElement;
-        if (form) {
-          form.requestSubmit();
-        }
+        handleSubmitShortcut();
+        return;
       }
 
       // ESC to cancel (with confirmation if there are changes)
@@ -170,40 +271,31 @@ export function TransactionsPage() {
   }, [isDialogOpen, formData]);
 
   const handleCancelWithConfirmation = () => {
-    const hasChanges =
-      formData.amount !== "" ||
-      formData.description !== "" ||
-      formData.tagId !== "";
+    const hasChanges = hasFormChanges(formData, editingTransaction);
+    const shouldCancel = !hasChanges || globalThis.confirm(
+      "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
+    );
 
-    if (hasChanges && !editingTransaction) {
-      if (
-        globalThis.confirm(
-          "¿Estás seguro de cancelar? Se perderán los cambios sin guardar."
-        )
-      ) {
-        setIsDialogOpen(false);
-        resetForm();
-      }
-    } else {
+    if (shouldCancel) {
       setIsDialogOpen(false);
       resetForm();
     }
   };
 
+  const loadUserData = async () => {
+    const profileData = await authApi.getProfile();
+    const [transactionsData, tagsData, accountsData] = await Promise.all([
+      transactionApi.getAll(),
+      tagApi.getAll(),
+      accountApi.getAll(profileData.user.id),
+    ]);
+    return { transactionsData, tagsData, accountsData };
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
-
-      // Load profile first to get userId
-      const profileData = await authApi.getProfile();
-
-      // Load other data in parallel
-      const [transactionsData, tagsData, accountsData] = await Promise.all([
-        transactionApi.getAll(),
-        tagApi.getAll(),
-        accountApi.getAll(profileData.user.id),
-      ]);
-
+      const { transactionsData, tagsData, accountsData } = await loadUserData();
       setTransactions(transactionsData);
       setTags(tagsData);
       setAccounts(accountsData);
@@ -218,47 +310,16 @@ export function TransactionsPage() {
   };
 
   const applyFilters = () => {
-    let result = [...transactions];
-
-    // Aplicar filtros de API
-    if (filters.accountId || filters.tagId || filters.isIncome !== undefined) {
-      if (filters.accountId) {
-        result = result.filter((t) => t.tag?.accountId === filters.accountId);
-      }
-      if (filters.tagId) {
-        result = result.filter((t) => t.tagId === filters.tagId);
-      }
-      if (filters.isIncome !== undefined) {
-        result = result.filter((t) => t.isIncome === filters.isIncome);
-      }
-    }
-
-    // Búsqueda por texto
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (t) =>
-          t.description?.toLowerCase().includes(query) ||
-          t.tag?.name.toLowerCase().includes(query) ||
-          t.amount.toString().includes(query)
-      );
-    }
-
+    const result = applyTransactionFilters(transactions, filters, searchQuery);
     setFilteredTransactions(result);
   };
 
   const handleFilterChange = () => {
-    const newFilters: TransactionFilters = {};
-
-    if (filterAccount !== "all") {
-      newFilters.accountId = Number(filterAccount);
-    }
-    if (filterTag !== "all") {
-      newFilters.tagId = Number(filterTag);
-    }
-    if (filterType !== "all") {
-      newFilters.isIncome = filterType === "income";
-    }
+    const newFilters: TransactionFilters = {
+      ...(filterAccount !== "all" && { accountId: Number(filterAccount) }),
+      ...(filterTag !== "all" && { tagId: Number(filterTag) }),
+      ...(filterType !== "all" && { isIncome: filterType === "income" }),
+    };
 
     setFilters(newFilters);
     setIsFilterOpen(false);
@@ -281,15 +342,7 @@ export function TransactionsPage() {
       return;
     }
 
-    setEditingTransaction(null);
-    setFormData({
-      amount: "",
-      isIncome: true,
-      transactionDate: new Date(),
-      description: "",
-      tagId: "",
-    });
-    setErrors({ amount: "", transactionDate: "", description: "", tagId: "" });
+    resetForm();
     setIsDialogOpen(true);
   };
 
@@ -313,46 +366,14 @@ export function TransactionsPage() {
 
   const validateForm = () => {
     const newErrors = {
-      amount: "",
-      transactionDate: "",
-      description: "",
-      tagId: "",
+      amount: validateAmount(formData.amount),
+      transactionDate: validateTransactionDate(formData.transactionDate),
+      description: validateDescription(formData.amount, formData.description),
+      tagId: formData.tagId ? "" : "Debe seleccionar una etiqueta",
     };
 
-    const amount = Number.parseFloat(formData.amount);
-
-    if (!formData.amount || Number.isNaN(amount)) {
-      newErrors.amount = "El monto es requerido";
-    } else if (amount <= 0) {
-      newErrors.amount = "El monto debe ser mayor a 0";
-    } else if (!/^\d+(\.\d{1,2})?$/.test(formData.amount)) {
-      newErrors.amount = "El monto debe tener máximo 2 decimales";
-    }
-
-    if (!formData.transactionDate) {
-      newErrors.transactionDate = "La fecha es requerida";
-    } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const selectedDate = new Date(formData.transactionDate);
-      selectedDate.setHours(0, 0, 0, 0);
-
-      if (selectedDate > today) {
-        newErrors.transactionDate = "La fecha no puede ser futura";
-      }
-    }
-
-    if (amount > 1000 && !formData.description.trim()) {
-      newErrors.description =
-        "La descripción es obligatoria para montos mayores a $1,000";
-    }
-
-    if (!formData.tagId) {
-      newErrors.tagId = "Debe seleccionar una etiqueta";
-    }
-
     setErrors(newErrors);
-    return Object.values(newErrors).every((error) => !error);
+    return !Object.values(newErrors).some((error) => error);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -412,17 +433,22 @@ export function TransactionsPage() {
   };
 
   // Calcular estadísticas
-  const stats = {
-    total: filteredTransactions.length,
-    income: filteredTransactions
+  const calculateStats = (transactions: Transaction[]) => {
+    const income = transactions
       .filter((t) => t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0),
-    expense: filteredTransactions
+      .reduce((sum, t) => sum + t.amount, 0);
+    const expense = transactions
       .filter((t) => !t.isIncome)
-      .reduce((sum, t) => sum + t.amount, 0),
-    balance: 0,
+      .reduce((sum, t) => sum + t.amount, 0);
+    return {
+      total: transactions.length,
+      income,
+      expense,
+      balance: income - expense,
+    };
   };
-  stats.balance = stats.income - stats.expense;
+
+  const stats = calculateStats(filteredTransactions);
 
   const hasActiveFilters =
     filterAccount !== "all" ||

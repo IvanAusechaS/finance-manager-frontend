@@ -34,7 +34,6 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  console.log("👤 [ProfilePage] Componente montado");
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);

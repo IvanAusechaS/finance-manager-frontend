@@ -43,8 +43,6 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  console.log("📝 [RegisterPage] Componente montado");
-
   const [formData, setFormData] = useState({
     nickname: "",
     email: "",
@@ -70,48 +68,71 @@ export function RegisterPage() {
   });
 
   /**
+   * Valida el campo nickname
+   */
+  const validateNickname = (value: string): string => {
+    if (!validateRequired(value)) {
+      return "Este campo es requerido";
+    }
+    if (!validateName(value)) {
+      return "El nombre debe tener al menos 2 caracteres y solo letras";
+    }
+    return "";
+  };
+
+  /**
+   * Valida el campo email
+   */
+  const validateEmailField = (value: string): string => {
+    if (!validateRequired(value)) {
+      return "Este campo es requerido";
+    }
+    if (!validateEmail(value)) {
+      return "Formato de correo inválido";
+    }
+    return "";
+  };
+
+  /**
+   * Valida el campo password
+   */
+  const validatePasswordField = (value: string): string => {
+    if (!validateRequired(value)) {
+      return "Este campo es requerido";
+    }
+    const passwordErrors = getPasswordErrors(value);
+    if (passwordErrors.length > 0) {
+      return passwordErrors.join(", ");
+    }
+    return "";
+  };
+
+  /**
+   * Valida el campo confirmPassword
+   */
+  const validateConfirmPassword = (value: string): string => {
+    if (!validateRequired(value)) {
+      return "Este campo es requerido";
+    }
+    if (value !== formData.password) {
+      return "Las contraseñas no coinciden";
+    }
+    return "";
+  };
+
+  /**
    * Validación en tiempo real de cada campo
    */
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case "nickname":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
-        }
-        if (!validateName(value)) {
-          return "El nombre debe tener al menos 2 caracteres y solo letras";
-        }
-        return "";
-
+        return validateNickname(value);
       case "email":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
-        }
-        if (!validateEmail(value)) {
-          return "Formato de correo inválido";
-        }
-        return "";
-
-      case "password": {
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
-        }
-        const passwordErrors = getPasswordErrors(value);
-        if (passwordErrors.length > 0) {
-          return passwordErrors.join(", ");
-        }
-        return "";
-      }
-
+        return validateEmailField(value);
+      case "password":
+        return validatePasswordField(value);
       case "confirmPassword":
-        if (!validateRequired(value)) {
-          return "Este campo es requerido";
-        }
-        if (value !== formData.password) {
-          return "Las contraseñas no coinciden";
-        }
-        return "";
-
+        return validateConfirmPassword(value);
       default:
         return "";
     }
@@ -247,8 +268,8 @@ export function RegisterPage() {
               </div>
 
               <div className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-3">
+                {benefits.map((benefit) => (
+                  <div key={benefit} className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <CheckCircle2 className="w-4 h-4 text-green-600" />
                     </div>

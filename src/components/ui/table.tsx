@@ -4,6 +4,13 @@ import * as React from "react";
 
 import { cn } from "./utils";
 
+/**
+ * Table component wrapper
+ * ⚠️ IMPORTANT: Always use with TableHeader and TableHead components to ensure accessibility
+ * Tables MUST have header rows with <th> elements when rendering actual data tables.
+ * 
+ * This is a generic wrapper component. The role will be overridden by consumers.
+ */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
@@ -12,6 +19,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     >
       <table
         data-slot="table"
+        role="presentation"
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
       />

@@ -1,8 +1,8 @@
 import { LegalOverlay } from "./LegalOverlay";
 
 interface CookiePolicyProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function CookiePolicy({ isOpen, onClose }: CookiePolicyProps) {
@@ -129,8 +129,8 @@ export function CookiePolicy({ isOpen, onClose }: CookiePolicyProps) {
           {/* Cookies Esenciales */}
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <h4 className="font-semibold text-green-900 mb-2 flex items-center gap-2">
-              <span className="text-xl">🔒</span>
-              Cookies Esenciales (Siempre Activas)
+              <span className="text-xl" aria-hidden="true">🔒</span>
+              <span>Cookies Esenciales (Siempre Activas)</span>
             </h4>
             <p className="text-slate-700 mb-3">
               Estas cookies son necesarias para el funcionamiento básico del
@@ -169,8 +169,8 @@ export function CookiePolicy({ isOpen, onClose }: CookiePolicyProps) {
           {/* Cookies de Funcionalidad */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-              <span className="text-xl">⚙️</span>
-              Cookies de Funcionalidad
+              <span className="text-xl" aria-hidden="true">⚙️</span>
+              <span>Cookies Funcionales</span>
             </h4>
             <p className="text-slate-700 mb-3">
               Estas cookies permiten que el sitio recuerde las elecciones que
@@ -205,8 +205,8 @@ export function CookiePolicy({ isOpen, onClose }: CookiePolicyProps) {
           {/* Cookies de Análisis */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <h4 className="font-semibold text-amber-900 mb-2 flex items-center gap-2">
-              <span className="text-xl">📊</span>
-              Cookies de Análisis
+              <span className="text-xl" aria-hidden="true">📊</span>
+              <span>Cookies de Análisis</span>
             </h4>
             <p className="text-slate-700 mb-3">
               Estas cookies nos ayudan a entender cómo los visitantes

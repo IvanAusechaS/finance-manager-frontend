@@ -20,8 +20,6 @@ import { AdminPage } from "./pages/Admin-seccion";
 import { AdminLoginPage } from "./pages/AdminLoginPage";
 
 export default function App() {
-  console.log("🚀 [App] Aplicación iniciada");
-
   return (
     <BrowserRouter>
       <Routes>

@@ -1,8 +1,8 @@
 import { LegalOverlay } from "./LegalOverlay";
 
 interface TermsOfServiceProps {
-  isOpen: boolean;
-  onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
 }
 
 export function TermsOfService({ isOpen, onClose }: TermsOfServiceProps) {

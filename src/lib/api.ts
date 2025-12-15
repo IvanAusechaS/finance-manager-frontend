@@ -422,14 +422,14 @@ export interface UpdateCategoryRequest {
  */
 export const categoryApi = {
   /**
-   * POST /api/category
+   * POST /api/categories
    * Create a new category
    */
   create: async (
     data: CreateCategoryRequest
   ): Promise<{ message: string; category: Category }> => {
     return apiRequest<{ message: string; category: Category }>(
-      "/api/category",
+      "/api/categories",
       {
         method: "POST",
         body: JSON.stringify(data),
@@ -438,27 +438,27 @@ export const categoryApi = {
   },
 
   /**
-   * GET /api/category
+   * GET /api/categories
    * Get all categories
    */
   getAll: async (): Promise<Category[]> => {
-    return apiRequest<Category[]>("/api/category", {
+    return apiRequest<Category[]>("/api/categories", {
       method: "GET",
     });
   },
 
   /**
-   * GET /api/category/:id
+   * GET /api/categories/:id
    * Get category by ID
    */
   getById: async (id: number): Promise<Category> => {
-    return apiRequest<Category>(`/api/category/${id}`, {
+    return apiRequest<Category>(`/api/categories/${id}`, {
       method: "GET",
     });
   },
 
   /**
-   * PUT /api/category/:id
+   * PUT /api/categories/:id
    * Update category
    */
   update: async (
@@ -466,7 +466,7 @@ export const categoryApi = {
     data: UpdateCategoryRequest
   ): Promise<{ message: string; category: Category }> => {
     return apiRequest<{ message: string; category: Category }>(
-      `/api/category/${id}`,
+      `/api/categories/${id}`,
       {
         method: "PUT",
         body: JSON.stringify(data),
@@ -475,11 +475,11 @@ export const categoryApi = {
   },
 
   /**
-   * DELETE /api/category/:id
+   * DELETE /api/categories/:id
    * Delete category
    */
   delete: async (id: number): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/api/category/${id}`, {
+    return apiRequest<{ message: string }>(`/api/categories/${id}`, {
       method: "DELETE",
     });
   },
@@ -516,40 +516,40 @@ export interface UpdateAccountRequest {
  */
 export const accountApi = {
   /**
-   * POST /api/account
+   * POST /api/accounts
    * Create a new account
    */
   create: async (
     data: CreateAccountRequest
   ): Promise<{ message: string; account: Account }> => {
-    return apiRequest<{ message: string; account: Account }>("/api/account", {
+    return apiRequest<{ message: string; account: Account }>("/api/accounts", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
   /**
-   * GET /api/account/:userId
+   * GET /api/accounts?userId=:userId
    * Get all accounts for a specific user
    */
   getAll: async (userId: number): Promise<Account[]> => {
-    return apiRequest<Account[]>(`/api/account/${userId}`, {
+    return apiRequest<Account[]>(`/api/accounts?userId=${userId}`, {
       method: "GET",
     });
   },
 
   /**
-   * GET /api/account/:id
+   * GET /api/accounts/:id
    * Get account by ID
    */
   getById: async (id: number): Promise<Account> => {
-    return apiRequest<Account>(`/api/account/${id}`, {
+    return apiRequest<Account>(`/api/accounts/${id}`, {
       method: "GET",
     });
   },
 
   /**
-   * PUT /api/account/:id
+   * PUT /api/accounts/:id
    * Update account
    */
   update: async (
@@ -557,7 +557,7 @@ export const accountApi = {
     data: UpdateAccountRequest
   ): Promise<{ message: string; account: Account }> => {
     return apiRequest<{ message: string; account: Account }>(
-      `/api/account/${id}`,
+      `/api/accounts/${id}`,
       {
         method: "PUT",
         body: JSON.stringify(data),
@@ -566,11 +566,11 @@ export const accountApi = {
   },
 
   /**
-   * DELETE /api/account/:id
+   * DELETE /api/accounts/:id
    * Delete account
    */
   delete: async (id: number): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/api/account/${id}`, {
+    return apiRequest<{ message: string }>(`/api/accounts/${id}`, {
       method: "DELETE",
     });
   },
@@ -609,58 +609,58 @@ export interface UpdateTagRequest {
  */
 export const tagApi = {
   /**
-   * POST /api/tag
+   * POST /api/tags
    * Create a new tag
    */
   create: async (
     data: CreateTagRequest
   ): Promise<{ message: string; tag: Tag }> => {
-    return apiRequest<{ message: string; tag: Tag }>("/api/tag", {
+    return apiRequest<{ message: string; tag: Tag }>("/api/tags", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
   /**
-   * GET /api/tag
+   * GET /api/tags
    * Get all tags for the authenticated user
    */
   getAll: async (): Promise<Tag[]> => {
-    return apiRequest<Tag[]>("/api/tag", {
+    return apiRequest<Tag[]>("/api/tags", {
       method: "GET",
     });
   },
 
   /**
-   * GET /api/tag/account/:accountId
+   * GET /api/tags/:accountId
    * Get all tags for a specific account
    */
   getByAccount: async (accountId: number): Promise<Tag[]> => {
-    return apiRequest<Tag[]>(`/api/tag/account/${accountId}`, {
+    return apiRequest<Tag[]>(`/api/tags/${accountId}`, {
       method: "GET",
     });
   },
 
   /**
-   * PUT /api/tag/:id
+   * PUT /api/tags/:id
    * Update tag
    */
   update: async (
     id: number,
     data: UpdateTagRequest
   ): Promise<{ message: string; tag: Tag }> => {
-    return apiRequest<{ message: string; tag: Tag }>(`/api/tag/${id}`, {
+    return apiRequest<{ message: string; tag: Tag }>(`/api/tags/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     });
   },
 
   /**
-   * DELETE /api/tag/:id
+   * DELETE /api/tags/:id
    * Delete tag
    */
   delete: async (id: number): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(`/api/tag/${id}`, {
+    return apiRequest<{ message: string }>(`/api/tags/${id}`, {
       method: "DELETE",
     });
   },

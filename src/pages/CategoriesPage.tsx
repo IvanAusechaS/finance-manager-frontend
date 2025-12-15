@@ -34,7 +34,6 @@ import type { Category, ApiError } from "../lib/api";
 import { Navbar } from "../components/Navbar";
 
 export function CategoriesPage() {
-  console.log("📁 [CategoriesPage] Componente montado");
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
